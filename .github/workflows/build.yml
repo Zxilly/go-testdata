@@ -3,6 +3,9 @@ name: Go Build and Release
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
     build:
       name: Build
