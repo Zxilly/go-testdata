@@ -52,15 +52,12 @@ jobs:
             path: artifacts
             merge-multiple: true
   
-        - name: Get the current date
-          id: date
-          run: echo "date=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
-  
         - name: Create Release
           uses: softprops/action-gh-release@v1
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
-            tag_name: ${{ steps.date.outputs.date }}
-            name: "Release ${{ steps.date.outputs.date }}"
+            tag_name: latest
+            name: "Release"
             files: "./artifacts/*"
+            prerelease: true
