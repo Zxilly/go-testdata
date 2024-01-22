@@ -31,9 +31,9 @@ jobs:
         - name: Build Project
           run: |
             if ${{ matrix.strip }}; then
-              go build -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip ./cmd/kubelet/kubelet.go
+              go build -ldflags="-s -w" -o kubelet-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip ./cmd/kubelet/kubelet.go
             else
-              go build -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} ./cmd/kubelet/kubelet.go
+              go build -o kubelet-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} ./cmd/kubelet/kubelet.go
             fi
           env:
             GOOS: ${{ matrix.platform }}
