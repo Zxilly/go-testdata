@@ -1,0 +1,66 @@
+name: Go Build and Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+    build:
+      name: Build
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          go-version: ["1.21"]
+          platform: [windows, darwin, linux]
+          arch: [amd64, arm64]
+          strip: [true, false]
+      steps:
+        - name: Install Go
+          uses: actions/setup-go@v5
+          with:
+            go-version: ${{ matrix.go-version }}
+  
+        - name: Checkout code
+          uses: actions/checkout@v4
+          with:
+            repository: kubernetes/kubernetes
+            fetch-depth: 1
+  
+        - name: Build Project
+          run: |
+            if ${{ matrix.strip }}; then
+              go build -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip ./cmd/kubelet/kubelet.go
+            else
+              go build -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} ./cmd/kubelet/kubelet.go
+            fi
+          env:
+            GOOS: ${{ matrix.platform }}
+            GOARCH: amd64
+  
+        - name: Upload artifacts
+          uses: actions/upload-artifact@v4
+          with:
+            name: kubelet-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.strip && '-strip' || '' }}
+            path: ./kubelet-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.strip && '-strip' || '' }}
+
+    release:
+      needs: build
+      runs-on: ubuntu-latest
+      steps:
+        - name: Download artifacts
+          uses: actions/download-artifact@v4
+          with:
+            path: artifacts
+            merge-multiple: true
+  
+        - name: Create Release
+          uses: softprops/action-gh-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            tag_name: kube
+            name: "Release"
+            files: "./artifacts/*"
+            prerelease: true

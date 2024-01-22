@@ -12,7 +12,7 @@ jobs:
       runs-on: ubuntu-latest
       strategy:
         matrix:
-          go-version: ["1.13", "1.14", "1.15", "1.16", "1.17", "1.18", "1.19", "1.20", "1.21"]
+          go-version: ["1.16", "1.17", "1.18", "1.19", "1.20", "1.21"]
           platform: [windows, darwin, linux]
           arch: [386, amd64, arm64]
           strip: [true, false]
@@ -28,9 +28,9 @@ jobs:
         - name: Build Project
           run: |
             if ${{ matrix.strip }}; then
-              go build -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip main.go
+              go build -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip .
             else
-              go build -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} main.go
+              go build -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} .
             fi
           env:
             GOOS: ${{ matrix.platform }}

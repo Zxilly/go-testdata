@@ -165,6 +165,8 @@ func main() {
 
 	UsingExternalDep()
 
+	UsingEmbed()
+
 	a := TestStruct{A: 1, B: "2", C: true}
 	println(ReflectGetA(a))
 }
