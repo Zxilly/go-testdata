@@ -1,4 +1,4 @@
-name: Go Build and Release
+name: Build mini example
 
 on:
   workflow_dispatch:
@@ -32,6 +32,12 @@ jobs:
             else
               go build -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} .
             fi
+
+            if ${{ matrix.strip }}; then
+              go build -tags "with_cgo" -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-cgo .
+            else
+              go build -tags "with_cgo" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-cgo .
+            fi
           env:
             GOOS: ${{ matrix.platform }}
             GOARCH: amd64
@@ -40,7 +46,9 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.strip && '-strip' || '' }}
-            path: ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.strip && '-strip' || '' }}
+            path: |
+              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.strip && '-strip' || '' }}
+              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.strip && '-strip' || '' }}-cgo
 
     release:
       needs: build

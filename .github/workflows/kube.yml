@@ -1,4 +1,4 @@
-name: Go Build and Release
+name: Build kubelet
 
 on:
   workflow_dispatch:
