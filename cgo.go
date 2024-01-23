@@ -7,7 +7,7 @@ package main
 #include <stdio.h>
 
 void printint(int v) {
-    printf("Print from cgo:", v);
+    printf("Print from cgo: %d", v);
 }
 */
 import "C"
