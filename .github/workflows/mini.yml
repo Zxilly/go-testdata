@@ -15,7 +15,6 @@ jobs:
           go-version: ["1.16", "1.17", "1.18", "1.19", "1.20", "1.21"]
           platform: [windows, darwin, linux]
           arch: [386, amd64, arm64]
-          strip: [true, false]
       steps:
         - name: Install Go
           uses: actions/setup-go@v5
@@ -27,17 +26,10 @@ jobs:
   
         - name: Build Project
           run: |
-            if ${{ matrix.strip }}; then
-              go build -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip .
-            else
-              go build -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} .
-            fi
-
-            if ${{ matrix.strip }}; then
-              go build -tags "with_cgo" -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-cgo .
-            else
-              go build -tags "with_cgo" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-cgo .
-            fi
+            go build -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip .
+            go build -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} .
+            go build -tags "with_cgo" -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-cgo .
+            go build -tags "with_cgo" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-cgo .
           env:
             GOOS: ${{ matrix.platform }}
             GOARCH: amd64
@@ -45,10 +37,12 @@ jobs:
         - name: Upload artifacts
           uses: actions/upload-artifact@v4
           with:
-            name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.strip && '-strip' || '' }}
+            name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}
             path: |
-              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.strip && '-strip' || '' }}
-              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.strip && '-strip' || '' }}-cgo
+              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}
+              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-cgo
+              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip
+              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-cgo
 
     release:
       needs: build
