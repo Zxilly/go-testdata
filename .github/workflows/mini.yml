@@ -26,10 +26,14 @@ jobs:
   
         - name: Build Project
           run: |
-            go build -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip .
             go build -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} .
-            go build -tags "with_cgo" -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-cgo .
             go build -tags "with_cgo" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-cgo .
+            go build -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip .
+            go build -tags "with_cgo" -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-cgo .
+            go build -ldflags="-extldflags \"-linkmode external\"" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-linker .
+            go build -tags "with_cgo" -ldflags="-extldflags \"-linkmode external\"" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-cgo-linker .
+            go build -ldflags="-s -w -extldflags \"-linkmode external\"" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-linker .
+            go build -tags "with_cgo" -ldflags="-s -w -extldflags \"-linkmode external\"" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-cgo-linker .
           env:
             GOOS: ${{ matrix.platform }}
             GOARCH: amd64
