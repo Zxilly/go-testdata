@@ -144,6 +144,8 @@ func ReflectGetA(t TestStruct) int {
 }
 
 func main() {
+	go UsingNet()
+
 	UsingConstInt()
 	UsingConstString()
 	UsingConstBool()
