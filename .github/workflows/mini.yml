@@ -41,7 +41,7 @@ jobs:
             go build -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext .
           env:
             GOOS: ${{ matrix.platform }}
-            GOARCH: amd64
+            GOARCH: ${{ matrix.arch }}
   
         - name: Upload artifacts
           uses: actions/upload-artifact@v4
