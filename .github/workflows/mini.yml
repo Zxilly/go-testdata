@@ -15,7 +15,7 @@ jobs:
       strategy:
         matrix:
           go-version: ["1.16", "1.17", "1.18", "1.19", "1.20", "1.21"]
-          arch: [386, amd64, arm64]
+          arch: [amd64]
           include:
             - os: windows-latest
               platform: windows
@@ -29,6 +29,7 @@ jobs:
           uses: actions/setup-go@v5
           with:
             go-version: ${{ matrix.go-version }}
+            cache: false
   
         - name: Checkout code
           uses: actions/checkout@v4
@@ -37,11 +38,18 @@ jobs:
           run: |
             go build -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} .
             go build -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip .
+          env:
+            GOOS: ${{ matrix.platform }}
+            GOARCH: ${{ matrix.arch }}
+
+        - name: Build Project
+          run: |
             go build -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext .
             go build -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext .
           env:
             GOOS: ${{ matrix.platform }}
             GOARCH: ${{ matrix.arch }}
+            CGO_ENABLED: 1
   
         - name: Upload artifacts
           uses: actions/upload-artifact@v4
@@ -63,7 +71,7 @@ jobs:
             path: artifacts
             merge-multiple: true
 
-        - uses: dev-drprasad/delete-tag-and-release@v1.0 # PRERELEASE is v1.0 and can also be used to test and give us feedback
+        - uses: dev-drprasad/delete-tag-and-release@v1.0
           with:
             tag_name: latest
             github_token: ${{ secrets.GITHUB_TOKEN }}
