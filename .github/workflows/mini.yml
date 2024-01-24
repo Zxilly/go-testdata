@@ -70,11 +70,6 @@ jobs:
           with:
             path: artifacts
             merge-multiple: true
-
-        - uses: dev-drprasad/delete-tag-and-release@v1.0
-          with:
-            tag_name: latest
-            github_token: ${{ secrets.GITHUB_TOKEN }}
   
         - name: Create Release
           uses: softprops/action-gh-release@v1
