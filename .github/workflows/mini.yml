@@ -34,19 +34,39 @@ jobs:
   
         - name: Checkout code
           uses: actions/checkout@v4
+
+        
+        - name: Install llvm
+          uses: KyleMayes/install-llvm-action@v1
+          with:
+            version: "17"
   
-        - name: Build Project
+        - name: Build pure exe
           run: |
-            go build -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} .
-            go build -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip .
+            go build -buildmode=exe -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} .
+            go build -buildmode=exe -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip .
           env:
             GOOS: ${{ matrix.platform }}
             GOARCH: ${{ matrix.arch }}
-
-        - name: Build Project
+        
+        - name: Build pure pie
           run: |
-            go build -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext .
-            go build -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext .
+            go build -buildmode=pie -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-pie .
+            go build -buildmode=pie -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-pie .
+
+        - name: Build cgo exe
+          run: |
+            go build -buildmode=exe -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext .
+            go build -buildmode=exe -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext .
+          env:
+            GOOS: ${{ matrix.platform }}
+            GOARCH: ${{ matrix.arch }}
+            CGO_ENABLED: 1
+        
+        - name: Build cgo pie
+          run: |
+            go build -buildmode=pie -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext-pie .
+            go build -buildmode=pie -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext-pie .
           env:
             GOOS: ${{ matrix.platform }}
             GOARCH: ${{ matrix.arch }}
@@ -58,9 +78,6 @@ jobs:
             name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}
             path: |
               ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}
-              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext
-              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip
-              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext
 
     release:
       needs: build
