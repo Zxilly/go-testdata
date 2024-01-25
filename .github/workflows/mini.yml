@@ -34,12 +34,6 @@ jobs:
   
         - name: Checkout code
           uses: actions/checkout@v4
-
-        
-        - name: Install llvm
-          uses: KyleMayes/install-llvm-action@v1
-          with:
-            version: "17"
   
         - name: Build pure exe
           run: |
