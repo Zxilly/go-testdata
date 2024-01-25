@@ -37,21 +37,21 @@ jobs:
   
         - name: Build pure exe
           run: |
-            go build -buildmode=exe -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} .
-            go build -buildmode=exe -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip .
+            go build -a -buildmode=exe -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} .
+            go build -a -buildmode=exe -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip .
           env:
             GOOS: ${{ matrix.platform }}
             GOARCH: ${{ matrix.arch }}
         
         - name: Build pure pie
           run: |
-            go build -buildmode=pie -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-pie .
-            go build -buildmode=pie -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-pie .
+            go build -a -buildmode=pie -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-pie .
+            go build -a -buildmode=pie -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-pie .
 
         - name: Build cgo exe
           run: |
-            go build -buildmode=exe -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext .
-            go build -buildmode=exe -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext .
+            go build -a -buildmode=exe -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext .
+            go build -a -buildmode=exe -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext .
           env:
             GOOS: ${{ matrix.platform }}
             GOARCH: ${{ matrix.arch }}
@@ -59,8 +59,8 @@ jobs:
         
         - name: Build cgo pie
           run: |
-            go build -buildmode=pie -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext-pie .
-            go build -buildmode=pie -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext-pie .
+            go build -a -buildmode=pie -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext-pie .
+            go build -a -buildmode=pie -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext-pie .
           env:
             GOOS: ${{ matrix.platform }}
             GOARCH: ${{ matrix.arch }}
