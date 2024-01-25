@@ -71,7 +71,7 @@ jobs:
           with:
             name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}
             path: |
-              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}
+              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}*
 
     release:
       needs: build
