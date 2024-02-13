@@ -1,7 +1,7 @@
 package main
 
 import (
-	"io"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 )
@@ -12,7 +12,7 @@ func UsingNet() {
 	if err != nil {
 		panic(err)
 	}
-	content, err := io.ReadAll(resp.Body)
+	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(nil)
 	}
