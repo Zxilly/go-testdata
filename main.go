@@ -1,10 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"reflect"
-
-	"github.com/pkg/errors"
 )
 
 const ConstInt = 12345
@@ -29,14 +26,6 @@ type ComplexStruct struct {
 type ComplexPointerStruct struct {
 	Str *string
 	Num *int
-}
-
-//go:noline
-func UsingExternalDep() {
-	err := errors.New("test")
-	err2 := errors.Errorf("okok %d", 233)
-	err3 := errors.Wrapf(err2, "and %d", 466)
-	fmt.Printf("err1=%v\nerr3=%v", err, err3)
 }
 
 //go:noinline
@@ -164,8 +153,6 @@ func main() {
 
 	UsingComplexStruct()
 	UsingComplexPointerStruct()
-
-	UsingExternalDep()
 
 	a := TestStruct{A: 1, B: "2", C: true}
 	println(ReflectGetA(a))
