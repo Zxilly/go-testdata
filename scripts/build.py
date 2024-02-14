@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import concurrent.futures
 import threading
@@ -32,14 +33,23 @@ options = {
     "cgo": [True, False],
 }
 
+go_binary = shutil.which("go")
+if go_binary is None:
+    raise FileNotFoundError("go binary not found in PATH")
+
+
 def remove_empty_lines(s: str) -> str:
     return "\n".join(filter(None, s.split("\n")))
+
 
 def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
     output = f"bin-{PLATFORM}-{GO_VERSION}-{ARCH}" + (
         f"-{output_suffix}" if output_suffix else ""
     )
-    command = f"go build -a -buildmode={buildmode} {ldflags+' ' if ldflags else ''}{output} -o  ."
+    args = ["go", "build", "-a", f"-buildmode={buildmode}"]
+    if ldflags:
+        args.append(ldflags)
+    args.extend(["-o", output, "."])
 
     env = cmd_env.copy()
     if not cgo:
@@ -48,7 +58,12 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
         env["CGO_ENABLED"] = "1"
 
     result = subprocess.run(
-        command, shell=True, capture_output=True, text=True, env=env
+        args=args,
+        executable=go_binary,
+        shell=True,
+        capture_output=True,
+        text=True,
+        env=env,
     )
     if result.returncode != 0:
         with write_lock:
@@ -56,7 +71,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
                 combined_output = result.stdout + "\n" + result.stderr
                 file.write(
                     f"Failed to build `{output}`:\n"
-                    f"Command: `{command}`\n"
+                    f"Command: `{result.args}`\n"
                     f"```log\n{remove_empty_lines(combined_output)}\n```\n"
                 )
 
