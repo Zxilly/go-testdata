@@ -13,7 +13,8 @@ ARCH: str = os.getenv("ARCH")
 if not all([PLATFORM, GO_VERSION, ARCH]):
     raise ValueError("Missing required environment variables")
 
-cmd_env = os.environ.copy().update(
+cmd_env = os.environ.copy()
+cmd_env.update(
     {
         "GOOS": PLATFORM,
         "GOARCH": ARCH,
