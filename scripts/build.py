@@ -2,6 +2,7 @@ import os
 import subprocess
 import concurrent.futures
 import threading
+from typing import Mapping
 
 
 PLATFORM: str = os.getenv("PLATFORM")
@@ -9,7 +10,7 @@ GO_VERSION: str = os.getenv("GO_VERSION")
 ARCH: str = os.getenv("ARCH")
 CGO: str = os.getenv("CGO")
 
-cmd_env: subprocess._ENV = {
+cmd_env: Mapping[str, str] = {
     "GOOS": PLATFORM,
     "GOARCH": ARCH,
 }
@@ -20,6 +21,7 @@ else:
     cmd_env["CGO_ENABLED"] = "1"
 
 write_lock = threading.Lock()
+
 
 def build(buildmode: str, ldflags: str, output_suffix: str) -> None:
     output = f"bin-{PLATFORM}-{GO_VERSION}-{ARCH}-{output_suffix}{CGO}"
