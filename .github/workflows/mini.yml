@@ -48,7 +48,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build pure exe
+      - name: Build binaries
         shell: bash
         run: |
           python scripts/build.py
@@ -96,7 +96,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build pure exe
+      - name: Build binaries
         shell: bash
         run: |
           python scripts/build.py
