@@ -13,7 +13,6 @@ logging.basicConfig(
 
 PLATFORM: str = os.getenv("PLATFORM")
 GO_VERSION: str = os.getenv("GO_VERSION")
-ARCH: str = os.getenv("ARCH")
 
 if not all([PLATFORM, GO_VERSION, ARCH]):
     raise ValueError("Missing required environment variables")
@@ -22,7 +21,6 @@ cmd_env = os.environ.copy()
 cmd_env.update(
     {
         "GOOS": PLATFORM,
-        "GOARCH": ARCH,
     }
 )
 
@@ -38,6 +36,10 @@ options = {
         (True, "cgo"),
         (False, ""),
     ],
+    "arch": [
+        "amd64",
+        "386",
+    ],
 }
 
 go_binary = shutil.which("go")
@@ -49,8 +51,10 @@ def remove_empty_lines(s: str) -> str:
     return "\n".join(filter(None, s.split("\n")))
 
 
-def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
-    output = f"bin-{PLATFORM}-{GO_VERSION}-{ARCH}" + (
+def build(
+    buildmode: str, arch: str, ldflags: str, cgo: bool, output_suffix: str
+) -> None:
+    output = f"bin-{PLATFORM}-{GO_VERSION}-{arch}" + (
         f"-{output_suffix}" if output_suffix else ""
     )
     args = [go_binary, "build", "-a", f"-buildmode={buildmode}"]
@@ -124,23 +128,26 @@ def main() -> None:
         for buildmode, buildmode_suffix in options["buildmode"]:
             for strip, strip_suffix in options["strip"]:
                 for cgo, cgo_suffix in options["cgo"]:
-                    parts = filter(
-                        None,
-                        [
-                            strip_suffix,
-                            buildmode_suffix,
-                            cgo_suffix,
-                        ],
-                    )
-                    output_suffix = "-".join(parts)
+                    for arch in options["arch"]:
+                        parts = filter(
+                            None,
+                            [
+                                strip_suffix,
+                                buildmode_suffix,
+                                cgo_suffix,
+                            ],
+                        )
+                        output_suffix = "-".join(parts)
 
-                    ldflags = ""
-                    if strip != "":
-                        ldflags = f'-ldflags={strip}'
+                        ldflags = ""
+                        if strip != "":
+                            ldflags = f"-ldflags={strip}"
 
-                    futures.append(
-                        executor.submit(build, buildmode, ldflags, cgo, output_suffix)
-                    )
+                        futures.append(
+                            executor.submit(
+                                build, buildmode, arch, ldflags, cgo, output_suffix
+                            )
+                        )
 
         for future in concurrent.futures.as_completed(futures):
             future.result()
