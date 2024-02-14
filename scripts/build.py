@@ -110,6 +110,11 @@ def build(
             if vers < 6:
                 # ld error
                 return
+            
+    if is_m1() and cgo:
+        if vers < 18:
+            # a dwarf error, see https://github.com/golang/go/issues/53000
+            return
 
     result = subprocess.run(
         args=args,
@@ -118,16 +123,17 @@ def build(
         env=env,
     )
     if result.returncode != 0:
+        print(f"Failed to build `{output}`")
         with log_lock:
             combined_output = result.stdout + "\n" + result.stderr
             logging.error(
                 f"Failed to build `{output}`:\n"
                 f"Command: `{result.args}`\n"
                 f"CGO_ENABLED: `{env['CGO_ENABLED']}`\n"
-                f"```log\n{remove_empty_lines(combined_output)}\n```\n"
+                f"```log\n{remove_empty_lines(combined_output)}\n```"
             )
     else:
-        print(f"Built `{output}` successfully\n")
+        print(f"Built `{output}` successfully")
 
 
 # order: strip-ext-pie-cgo
