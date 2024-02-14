@@ -60,9 +60,9 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
     else:
         env["CGO_ENABLED"] = "1"
 
-    if cgo and not ldflags.find("-linkmode external") == -1:
-        # cgo relies on external linking
-        return
+    # if not cgo and ldflags.find("-linkmode external") == -1:
+    #     # cgo relies on external linking
+    #     return
 
     if PLATFORM == "windows" and buildmode == "pie":
         vers = int(GO_VERSION.split(".")[1])
@@ -83,6 +83,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
                 file.write(
                     f"Failed to build `{output}`:\n"
                     f"Command: `{result.args}`\n"
+                    f"CGO_ENABLED={env['CGO_ENABLED']}\n"
                     f"```log\n{remove_empty_lines(combined_output)}\n```\n"
                 )
 
