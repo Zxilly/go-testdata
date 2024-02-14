@@ -77,9 +77,9 @@ jobs:
           - "1.9"
           - "1.10"
         arch: [amd64]
-        os: [windows-2022, ubuntu-20.04, macos-11]
+        os: [windows-2019, ubuntu-20.04, macos-11]
         include:
-          - os: windows-2022
+          - os: windows-2019
             platform: windows
           - os: ubuntu-20.04
             platform: linux
