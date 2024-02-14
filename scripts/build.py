@@ -88,7 +88,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
                 # have bug on new macOS
                 return
 
-        if PLATFORM == "windows":
+        if PLATFORM == "linux":
             if vers < 6:
                 # ld error
                 return
