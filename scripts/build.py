@@ -46,7 +46,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
     output = f"bin-{PLATFORM}-{GO_VERSION}-{ARCH}" + (
         f"-{output_suffix}" if output_suffix else ""
     )
-    args = ["go", "build", "-a", f"-buildmode={buildmode}"]
+    args = [go_binary, "build", "-a", f"-buildmode={buildmode}"]
     if ldflags:
         args.append(ldflags)
     args.extend(["-o", output, "."])
@@ -59,7 +59,6 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
 
     result = subprocess.run(
         args=args,
-        executable=go_binary,
         shell=True,
         capture_output=True,
         text=True,
