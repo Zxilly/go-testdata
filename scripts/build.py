@@ -31,7 +31,7 @@ options = {
 
 
 def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
-    output = f"bin-{PLATFORM}-{GO_VERSION}-{ARCH}-{output_suffix}"
+    output = f"bin-{PLATFORM}-{GO_VERSION}-{ARCH}" + (f"-{output_suffix}" if output_suffix else "")
     command = rf"go build -a -buildmode={buildmode} {output} {ldflags} -o  ."
 
     env = cmd_env.copy()
@@ -59,8 +59,9 @@ def main() -> None:
             for strip, strip_suffix in options["strip"]:
                 for external, external_suffix in options["external"]:
                     for cgo in options["cgo"]:
+                        parts = filter(None, [strip_suffix, external_suffix, buildmode_suffix])
                         output_suffix = (
-                            "-".join([strip_suffix, external_suffix, buildmode_suffix])
+                            "-".join(parts)
                         )
 
                         ldflags = ""
