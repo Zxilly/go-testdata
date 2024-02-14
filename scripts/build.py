@@ -76,7 +76,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
             if vers < 8:
                 # Linux does not support PIE
                 return
-            
+
         if PLATFORM == "darwin":
             if vers < 10:
                 # Darwin does not support PIE
@@ -113,7 +113,11 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
 
 # order: strip-ext-pie-cgo
 def main() -> None:
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    worker_count = os.cpu_count()
+    if PLATFORM == "windows":
+        worker_count = 1
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=worker_count) as executor:
         futures = []
 
         for buildmode, buildmode_suffix in options["buildmode"]:
