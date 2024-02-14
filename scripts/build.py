@@ -52,7 +52,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
                 file.write(
                     f"Failed to build `{output}`:\n"
                     f"Command: `{command}`\n"
-                    + "```log\n{combined_output}```\n"
+                    f"```log\n{combined_output}```\n"
                 )
 
 
