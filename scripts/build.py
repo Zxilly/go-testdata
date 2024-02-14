@@ -60,9 +60,9 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
     else:
         env["CGO_ENABLED"] = "1"
 
-    # if not cgo and ldflags.find("-linkmode external") == -1:
-    #     # cgo relies on external linking
-    #     return
+    if not cgo and ldflags.find("-linkmode external") == -1:
+        # cgo relies on external linking
+        return
 
     if PLATFORM == "windows" and buildmode == "pie":
         vers = int(GO_VERSION.split(".")[1])
