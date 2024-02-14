@@ -26,11 +26,13 @@ jobs:
           - "1.20"
           - "1.21"
           - "1.22"
-        os: [windows-2022, macos-12, ubuntu-22.04]
+        os: [windows-2022, macos-12, ubuntu-22.04, macos-14-xlarge]
         include:
           - os: windows-2022
             platform: windows
           - os: macos-12
+            platform: darwin
+          - os: macos-14-xlarge
             platform: darwin
           - os: ubuntu-22.04
             platform: linux

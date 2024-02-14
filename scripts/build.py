@@ -4,6 +4,7 @@ import subprocess
 import concurrent.futures
 import threading
 import logging
+import platform
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -26,6 +27,14 @@ cmd_env.update(
 
 log_lock = threading.Lock()
 
+def is_m1():
+    system = platform.system()
+    architecture = platform.machine()
+    if system == 'Darwin' and architecture == 'arm64':
+        return True
+    else:
+        return False
+
 options = {
     "buildmode": [("exe", ""), ("pie", "pie")],
     "strip": [
@@ -41,6 +50,11 @@ options = {
         "386",
     ],
 }
+
+if is_m1():
+    options["arch"] = [
+        "arm64",
+    ]
 
 go_binary = shutil.which("go")
 if go_binary is None:
