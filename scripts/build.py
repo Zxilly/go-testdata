@@ -34,7 +34,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
     output = f"bin-{PLATFORM}-{GO_VERSION}-{ARCH}" + (
         f"-{output_suffix}" if output_suffix else ""
     )
-    command = rf"go build -a -buildmode={buildmode} {output} {ldflags} -o  ."
+    command = rf"go build -a -buildmode={buildmode}{f" {ldflags} " if ldflags else ""}{output} -o  ."
 
     env = cmd_env.copy()
     if not cgo:
