@@ -28,6 +28,7 @@ jobs:
           - "1.21"
           - "1.22"
         arch: [amd64]
+        os: [windows-2022, macos-12, ubuntu-22.04]
         include:
           - os: windows-2022
             platform: windows
@@ -101,6 +102,7 @@ jobs:
           - "1.9"
           - "1.10"
         arch: [amd64]
+        os: [windows-2019, macos-11, ubuntu-20.04]
         include:
           - os: windows-2019
             platform: windows
