@@ -2,109 +2,183 @@ name: Build mini example
 
 on:
   workflow_dispatch:
-  push: 
+  push:
     branches: master
 
 permissions:
   contents: write
 
 jobs:
-    build:
-      name: Build
-      runs-on: ${{ matrix.os }}
-      strategy:
-        matrix:
-          go-version: 
-            - "1.11"
-            - "1.12"
-            - "1.13"
-            - "1.14"
-            - "1.15"
-            - "1.16"
-            - "1.17"
-            - "1.18"
-            - "1.19"
-            - "1.20"
-            - "1.21"
-            - "1.22"
-          arch: [amd64]
-          os: ['windows-latest', 'macos-latest', 'ubuntu-latest']
-          include:
-            - os: windows-latest
-              platform: windows
-            - os: macos-latest
-              platform: darwin
-            - os: ubuntu-latest
-              platform: linux
-        fail-fast: true
-      steps:
-        - name: Install Go
-          uses: actions/setup-go@v5
-          with:
-            go-version: ${{ matrix.go-version }}
-            cache: false
-  
-        - name: Checkout code
-          uses: actions/checkout@v4
-  
-        - name: Build pure exe
-          shell: bash
-          run: |
-            go build -a -buildmode=exe -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} . || true
-            go build -a -buildmode=exe -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip . || true
-          env:
-            GOOS: ${{ matrix.platform }}
-            GOARCH: ${{ matrix.arch }}
-        
-        - name: Build pure pie
-          shell: bash
-          run: |
-            go build -a -buildmode=pie -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-pie . || true
-            go build -a -buildmode=pie -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-pie . || true
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        go-version:
+          - "1.11"
+          - "1.12"
+          - "1.13"
+          - "1.14"
+          - "1.15"
+          - "1.16"
+          - "1.17"
+          - "1.18"
+          - "1.19"
+          - "1.20"
+          - "1.21"
+          - "1.22"
+        arch: [amd64]
+        include:
+          - os: windows-2022
+            platform: windows
+          - os: macos-12
+            platform: darwin
+          - os: ubuntu-22.04
+            platform: linux
+      fail-fast: true
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: false
 
-        - name: Build cgo exe
-          shell: bash
-          run: |
-            go build -a -buildmode=exe -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext . || true
-            go build -a -buildmode=exe -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext . || true
-          env:
-            GOOS: ${{ matrix.platform }}
-            GOARCH: ${{ matrix.arch }}
-            CGO_ENABLED: 1
-        
-        - name: Build cgo pie
-          shell: bash
-          run: |
-            go build -a -buildmode=pie -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext-pie . || true
-            go build -a -buildmode=pie -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext-pie . || true
-          env:
-            GOOS: ${{ matrix.platform }}
-            GOARCH: ${{ matrix.arch }}
-            CGO_ENABLED: 1
-  
-        - name: Upload artifacts
-          uses: actions/upload-artifact@v4
-          with:
-            name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}
-            path: |
-              ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}*
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    release:
-      needs: build
-      runs-on: ubuntu-latest
-      steps:
-        - name: Download artifacts
-          uses: actions/download-artifact@v4
-          with:
-            path: artifacts
-            merge-multiple: true
-  
-        - name: Create Release
-          uses: softprops/action-gh-release@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            tag_name: latest
-            name: "Release"
-            files: "./artifacts/*"
-            prerelease: true
+      - name: Build pure exe
+        shell: bash
+        run: |
+          go build -a -buildmode=exe -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} . || true
+          go build -a -buildmode=exe -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip . || true
+        env:
+          GOOS: ${{ matrix.platform }}
+          GOARCH: ${{ matrix.arch }}
+
+      - name: Build pure pie
+        shell: bash
+        run: |
+          go build -a -buildmode=pie -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-pie . || true
+          go build -a -buildmode=pie -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-pie . || true
+
+      - name: Build cgo exe
+        shell: bash
+        run: |
+          go build -a -buildmode=exe -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext . || true
+          go build -a -buildmode=exe -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext . || true
+        env:
+          GOOS: ${{ matrix.platform }}
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: 1
+
+      - name: Build cgo pie
+        shell: bash
+        run: |
+          go build -a -buildmode=pie -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext-pie . || true
+          go build -a -buildmode=pie -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext-pie . || true
+        env:
+          GOOS: ${{ matrix.platform }}
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: 1
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}
+          path: |
+            ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}*
+
+  build_old:
+    name: Build old versions
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        go-version:
+          - "1.5"
+          - "1.6"
+          - "1.7"
+          - "1.8"
+          - "1.9"
+          - "1.10"
+        arch: [amd64]
+        include:
+          - os: windows-2019
+            platform: windows
+          - os: macos-11
+            platform: darwin
+          - os: ubuntu-20.04
+            platform: linux
+      fail-fast: true
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: false
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build pure exe
+        shell: bash
+        run: |
+          go build -a -buildmode=exe -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} . || true
+          go build -a -buildmode=exe -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip . || true
+        env:
+          GOOS: ${{ matrix.platform }}
+          GOARCH: ${{ matrix.arch }}
+
+      - name: Build pure pie
+        shell: bash
+        run: |
+          go build -a -buildmode=pie -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-pie . || true
+          go build -a -buildmode=pie -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-pie . || true
+
+      - name: Build cgo exe
+        shell: bash
+        run: |
+          go build -a -buildmode=exe -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext . || true
+          go build -a -buildmode=exe -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext . || true
+        env:
+          GOOS: ${{ matrix.platform }}
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: 1
+
+      - name: Build cgo pie
+        shell: bash
+        run: |
+          go build -a -buildmode=pie -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext-pie . || true
+          go build -a -buildmode=pie -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext-pie . || true
+        env:
+          GOOS: ${{ matrix.platform }}
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: 1
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}
+          path: |
+            ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}*
+
+  release:
+    needs:
+      - build
+      - build_old
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: latest
+          name: "Release"
+          files: "./artifacts/*"
+          prerelease: true
