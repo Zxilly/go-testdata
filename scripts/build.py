@@ -47,7 +47,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
         with write_lock:
             with open(os.getenv("GITHUB_STEP_SUMMARY"), "a") as file:
                 combined_output = result.stdout + "\n" + result.stderr
-                file.write("Failed to build " + output + "\n" + combined_output)
+                file.write(f"Failed to build {output}:\n```log\n{combined_output}\n```\n")
 
 
 # order: strip-ext-pie-cgo
@@ -60,7 +60,7 @@ def main() -> None:
                 for external, external_suffix in options["external"]:
                     for cgo in options["cgo"]:
                         output_suffix = (
-                            f"{strip_suffix}-{external_suffix}-{buildmode_suffix}"
+                            "-".join([strip_suffix, external_suffix, buildmode_suffix])
                         )
 
                         ldflags = ""
