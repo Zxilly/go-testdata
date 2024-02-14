@@ -14,7 +14,7 @@ logging.basicConfig(
 PLATFORM: str = os.getenv("PLATFORM")
 GO_VERSION: str = os.getenv("GO_VERSION")
 
-if not all([PLATFORM, GO_VERSION, ARCH]):
+if not all([PLATFORM, GO_VERSION]):
     raise ValueError("Missing required environment variables")
 
 cmd_env = os.environ.copy()
