@@ -63,7 +63,7 @@ jobs:
       - name: Build binaries
         shell: bash
         run: |
-          python scripts/build.py
+          python3 scripts/build.py
         env:
           PLATFORM: ${{ matrix.platform }}
           GO_VERSION: ${{ matrix.go-version }}
