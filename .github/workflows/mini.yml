@@ -26,7 +26,6 @@ jobs:
           - "1.20"
           - "1.21"
           - "1.22"
-        arch: [amd64]
         os: [windows-2022, macos-12, ubuntu-22.04]
         include:
           - os: windows-2022
@@ -54,7 +53,6 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
           GO_VERSION: ${{ matrix.go-version }}
-          ARCH: ${{ matrix.arch }}
 
       - name: Upload artifacts
         if: ${{ github.event_name != 'push' }}
@@ -76,7 +74,6 @@ jobs:
           - "1.8"
           - "1.9"
           - "1.10"
-        arch: [amd64]
         os: [windows-2019, ubuntu-20.04, macos-11]
         include:
           - os: windows-2019
@@ -109,7 +106,6 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
           GO_VERSION: ${{ matrix.go-version }}
-          ARCH: ${{ matrix.arch }}
 
       - name: Upload artifacts
         if: ${{ github.event_name != 'push' }}
