@@ -76,12 +76,14 @@ jobs:
           - "1.9"
           - "1.10"
         arch: [amd64]
-        os: [windows-2019, ubuntu-20.04]
+        os: [windows-2019, ubuntu-20.04, macos-11]
         include:
           - os: windows-2019
             platform: windows
           - os: ubuntu-20.04
             platform: linux
+          - os: macos-11
+            platform: darwin
       fail-fast: true
     steps:
       - name: Install Go
