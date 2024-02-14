@@ -39,16 +39,6 @@ jobs:
             platform: linux
       fail-fast: true
     steps:
-      - name: Set CGO
-        if: ${{ matrix.cgo == '-cgo' }}
-        run: |
-          echo "CGO_ENABLED=1" >> $GITHUB_ENV
-
-      - name: Disable CGO
-        if: ${{ matrix.cgo != '-cgo' }}
-        run: |
-          echo "CGO_ENABLED=0" >> $GITHUB_ENV
-
       - name: Install Go
         uses: actions/setup-go@v5
         with:
@@ -61,35 +51,12 @@ jobs:
       - name: Build pure exe
         shell: bash
         run: |
-          go build -a -buildmode=exe -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-          go build -a -buildmode=exe -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
+          python scripts/build.py
         env:
-          GOOS: ${{ matrix.platform }}
-          GOARCH: ${{ matrix.arch }}
-
-      - name: Build pure pie
-        shell: bash
-        run: |
-          go build -a -buildmode=pie -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-pie . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-          go build -a -buildmode=pie -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-pie${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-
-      - name: Build external exe
-        shell: bash
-        run: |
-          go build -a -buildmode=exe -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-          go build -a -buildmode=exe -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-        env:
-          GOOS: ${{ matrix.platform }}
-          GOARCH: ${{ matrix.arch }}
-
-      - name: Build external pie
-        shell: bash
-        run: |
-          go build -a -buildmode=pie -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext-pie${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-          go build -a -buildmode=pie -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext-pie${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-        env:
-          GOOS: ${{ matrix.platform }}
-          GOARCH: ${{ matrix.arch }}
+          PLATFORM: ${{ matrix.platform }}
+          GO_VERSION: ${{ matrix.go-version }}
+          ARCH: ${{ matrix.arch }}
+          CGO: ${{ matrix.cgo }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -120,16 +87,6 @@ jobs:
             platform: linux
       fail-fast: true
     steps:
-      - name: Set CGO
-        if: ${{ matrix.cgo == '-cgo' }}
-        run: |
-          echo "CGO_ENABLED=1" >> $GITHUB_ENV
-
-      - name: Disable CGO
-        if: ${{ matrix.cgo != '-cgo' }}
-        run: |
-          echo "CGO_ENABLED=0" >> $GITHUB_ENV
-
       - name: Install Go
         uses: actions/setup-go@v5
         with:
@@ -142,35 +99,12 @@ jobs:
       - name: Build pure exe
         shell: bash
         run: |
-          go build -a -buildmode=exe -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-          go build -a -buildmode=exe -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
+          python scripts/build.py
         env:
-          GOOS: ${{ matrix.platform }}
-          GOARCH: ${{ matrix.arch }}
-
-      - name: Build pure pie
-        shell: bash
-        run: |
-          go build -a -buildmode=pie -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-pie${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-          go build -a -buildmode=pie -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-pie${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-
-      - name: Build external exe
-        shell: bash
-        run: |
-          go build -a -buildmode=exe -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-          go build -a -buildmode=exe -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-        env:
-          GOOS: ${{ matrix.platform }}
-          GOARCH: ${{ matrix.arch }}
-
-      - name: Build external pie
-        shell: bash
-        run: |
-          go build -a -buildmode=pie -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext-pie${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-          go build -a -buildmode=pie -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext-pie${{ matrix.cgo }} . || echo "Failed to build" >> $GITHUB_STEP_SUMMARY
-        env:
-          GOOS: ${{ matrix.platform }}
-          GOARCH: ${{ matrix.arch }}
+          PLATFORM: ${{ matrix.platform }}
+          GO_VERSION: ${{ matrix.go-version }}
+          ARCH: ${{ matrix.arch }}
+          CGO: ${{ matrix.cgo }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
