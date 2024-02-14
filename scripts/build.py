@@ -13,10 +13,12 @@ ARCH: str = os.getenv("ARCH")
 if not all([PLATFORM, GO_VERSION, ARCH]):
     raise ValueError("Missing required environment variables")
 
-cmd_env: Mapping[str, str] = {
-    "GOOS": PLATFORM,
-    "GOARCH": ARCH,
-}
+cmd_env = os.environ.copy().update(
+    {
+        "GOOS": PLATFORM,
+        "GOARCH": ARCH,
+    }
+)
 
 write_lock = threading.Lock()
 
@@ -84,14 +86,22 @@ def main() -> None:
                 for external, external_suffix in options["external"]:
                     for cgo in options["cgo"]:
                         parts = filter(
-                            None, [strip_suffix, external_suffix, buildmode_suffix, "cgo" if cgo else ""]
+                            None,
+                            [
+                                strip_suffix,
+                                external_suffix,
+                                buildmode_suffix,
+                                "cgo" if cgo else "",
+                            ],
                         )
                         output_suffix = "-".join(parts)
 
                         ldflags = ""
 
                         if strip != "" or external != "":
-                            ldflags = f'-ldflags={" ".join([strip, external])}'
+                            ldflags = (
+                                f'-ldflags={" ".join(filter(None, [strip, external]))}'
+                            )
 
                         futures.append(
                             executor.submit(
