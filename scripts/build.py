@@ -32,12 +32,14 @@ options = {
     "cgo": [True, False],
 }
 
+def remove_empty_lines(s: str) -> str:
+    return "\n".join(filter(None, s.split("\n")))
 
 def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
     output = f"bin-{PLATFORM}-{GO_VERSION}-{ARCH}" + (
         f"-{output_suffix}" if output_suffix else ""
     )
-    command = f"go build -a -buildmode={buildmode}{' '+ldflags+' ' if ldflags else ''}{output} -o  ."
+    command = f"go build -a -buildmode={buildmode} {ldflags+' ' if ldflags else ''}{output} -o  ."
 
     env = cmd_env.copy()
     if not cgo:
@@ -55,7 +57,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
                 file.write(
                     f"Failed to build `{output}`:\n"
                     f"Command: `{command}`\n"
-                    f"```log\n{combined_output}```\n"
+                    f"```log\n{remove_empty_lines(combined_output)}\n```\n"
                 )
 
 
