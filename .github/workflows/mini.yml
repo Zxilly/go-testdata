@@ -56,8 +56,8 @@ jobs:
       - name: Build pure exe
         shell: bash
         run: |
-          go build -a -buildmode=exe -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }} . || true
-          go build -a -buildmode=exe -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip . || true
+          go build -a -buildmode=exe -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.cgo }} . || true
+          go build -a -buildmode=exe -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip${{ matrix.cgo }} . || true
         env:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
@@ -66,13 +66,13 @@ jobs:
         shell: bash
         run: |
           go build -a -buildmode=pie -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-pie . || true
-          go build -a -buildmode=pie -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-pie . || true
+          go build -a -buildmode=pie -ldflags="-s -w" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-pie${{ matrix.cgo }} . || true
 
       - name: Build external exe
         shell: bash
         run: |
-          go build -a -buildmode=exe -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext . || true
-          go build -a -buildmode=exe -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext . || true
+          go build -a -buildmode=exe -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext${{ matrix.cgo }} . || true
+          go build -a -buildmode=exe -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext${{ matrix.cgo }} . || true
         env:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
@@ -80,8 +80,8 @@ jobs:
       - name: Build external pie
         shell: bash
         run: |
-          go build -a -buildmode=pie -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext-pie . || true
-          go build -a -buildmode=pie -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext-pie . || true
+          go build -a -buildmode=pie -ldflags="-linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-ext-pie${{ matrix.cgo }} . || true
+          go build -a -buildmode=pie -ldflags="-s -w -linkmode external" -o bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}-strip-ext-pie${{ matrix.cgo }} . || true
         env:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
@@ -89,9 +89,9 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}
+          name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.cgo }}
           path: |
-            ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}*
+            ./bin-*
 
   build_old:
     name: Build old versions
@@ -166,9 +166,9 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}
+          name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.cgo }}
           path: |
-            ./bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}*
+            ./bin-*
 
   release:
     needs:
