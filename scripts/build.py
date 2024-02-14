@@ -3,8 +3,9 @@ import shutil
 import subprocess
 import concurrent.futures
 import threading
-from typing import Mapping
+import logging
 
+logging.basicConfig(level=logging.DEBUG, filename=os.getenv("GITHUB_STEP_SUMMARY"))
 
 PLATFORM: str = os.getenv("PLATFORM")
 GO_VERSION: str = os.getenv("GO_VERSION")
@@ -21,7 +22,7 @@ cmd_env.update(
     }
 )
 
-write_lock = threading.Lock()
+log_lock = threading.Lock()
 
 options = {
     "buildmode": [("exe", ""), ("pie", "pie")],
@@ -36,7 +37,7 @@ options = {
     "cgo": [
         (True, "cgo"),
         (False, ""),
-    ]
+    ],
 }
 
 go_binary = shutil.which("go")
@@ -99,19 +100,17 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
         env=env,
     )
     if result.returncode != 0:
-        with write_lock:
-            with open(os.getenv("GITHUB_STEP_SUMMARY"), "a") as file:
-                combined_output = result.stdout + "\n" + result.stderr
-                file.write(
-                    f"Failed to build `{output}`:\n"
-                    f"Command: `{result.args}`\n"
-                    f"CGO_ENABLED={env['CGO_ENABLED']}\n"
-                    f"```log\n{remove_empty_lines(combined_output)}\n```\n"
-                )
+        with log_lock:
+            combined_output = result.stdout + "\n" + result.stderr
+            logging.error(
+                f"Failed to build `{output}`:\n"
+                f"Command: `{result.args}`\n"
+                f"CGO_ENABLED={env['CGO_ENABLED']}\n"
+                f"```log\n{remove_empty_lines(combined_output)}\n```\n"
+            )
     else:
-        with write_lock:
-            with open(os.getenv("GITHUB_STEP_SUMMARY"), "a") as file:
-                file.write(f"Built `{output}` successfully\n")
+        with log_lock:
+            logging.info(f"Built `{output}` successfully\n")
 
 
 # order: strip-ext-pie-cgo
