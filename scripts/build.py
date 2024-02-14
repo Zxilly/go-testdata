@@ -82,6 +82,17 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
                 # Darwin does not support PIE
                 return
 
+    if cgo:
+        if PLATFORM == "darwin":
+            if vers < 10:
+                # have bug on new macOS
+                return
+
+        if PLATFORM == "windows":
+            if vers < 6:
+                # ld error
+                return
+
     result = subprocess.run(
         args=args,
         capture_output=True,
