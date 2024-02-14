@@ -47,7 +47,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
         with write_lock:
             with open(os.getenv("GITHUB_STEP_SUMMARY"), "a") as file:
                 combined_output = result.stdout + "\n" + result.stderr
-                file.write(f"Failed to build {output}:\n```log\n{combined_output}\n```\n")
+                file.write(f"Failed to build `{output}`:\n```log\n{combined_output}\n```\n")
 
 
 # order: strip-ext-pie-cgo
