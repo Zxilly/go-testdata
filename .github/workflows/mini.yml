@@ -84,7 +84,7 @@ jobs:
             platform: linux
           - os: macos-11
             platform: darwin
-      fail-fast: true
+      fail-fast: false
     steps:
       - name: Install Go
         uses: actions/setup-go@v5

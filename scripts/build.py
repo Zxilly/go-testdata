@@ -60,7 +60,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
     else:
         env["CGO_ENABLED"] = "1"
 
-    if not cgo and ldflags.find("-linkmode external") == -1:
+    if (not cgo) and (ldflags.find("external") != -1):
         # cgo relies on external linking
         return
     
@@ -103,6 +103,10 @@ def main() -> None:
             for strip, strip_suffix in options["strip"]:
                 for external, external_suffix in options["external"]:
                     for cgo in options["cgo"]:
+                        if cgo and external:
+                            # meaningless, since cgo implies external linking
+                            continue
+
                         parts = filter(
                             None,
                             [
