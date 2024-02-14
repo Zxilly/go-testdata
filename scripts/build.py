@@ -63,18 +63,24 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
     if (not cgo) and (ldflags.find("external") != -1):
         # cgo relies on external linking
         return
-    
+
     vers = int(GO_VERSION.split(".")[1])
 
-    if PLATFORM == "windows" and buildmode == "pie":
-        if vers < 15:
-            # Windows does not support PIE
-            return
-        
-    if PLATFORM == "linux" and buildmode == "pie":
-        if vers < 8:
-            # Linux does not support PIE
-            return
+    if buildmode == "pie":
+        if PLATFORM == "windows":
+            if vers < 15:
+                # Windows does not support PIE
+                return
+
+        if PLATFORM == "linux":
+            if vers < 8:
+                # Linux does not support PIE
+                return
+            
+        if PLATFORM == "darwin":
+            if vers < 10:
+                # Darwin does not support PIE
+                return
 
     result = subprocess.run(
         args=args,

@@ -66,6 +66,8 @@ jobs:
   build_old:
     name: Build old versions
     runs-on: ${{ matrix.os }}
+    # ignore darwin 1.5 and 1.6
+    if: matrix.go-version != '1.5' && matrix.go-version != '1.6' && matrix.os == 'macos-11'
     strategy:
       matrix:
         go-version:
