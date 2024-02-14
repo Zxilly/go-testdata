@@ -5,7 +5,11 @@ import concurrent.futures
 import threading
 import logging
 
-logging.basicConfig(level=logging.DEBUG, filename=os.getenv("GITHUB_STEP_SUMMARY"))
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename=os.getenv("GITHUB_STEP_SUMMARY"),
+    format="%(message)s",
+)
 
 PLATFORM: str = os.getenv("PLATFORM")
 GO_VERSION: str = os.getenv("GO_VERSION")
@@ -109,8 +113,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
                 f"```log\n{remove_empty_lines(combined_output)}\n```\n"
             )
     else:
-        with log_lock:
-            logging.info(f"Built `{output}` successfully\n")
+        print(f"Built `{output}` successfully\n")
 
 
 # order: strip-ext-pie-cgo
