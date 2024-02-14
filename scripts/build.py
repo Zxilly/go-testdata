@@ -59,7 +59,6 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
 
     result = subprocess.run(
         args=args,
-        shell=True,
         capture_output=True,
         text=True,
         env=env,
@@ -85,17 +84,14 @@ def main() -> None:
                 for external, external_suffix in options["external"]:
                     for cgo in options["cgo"]:
                         parts = filter(
-                            None, [strip_suffix, external_suffix, buildmode_suffix]
+                            None, [strip_suffix, external_suffix, buildmode_suffix, "cgo" if cgo else ""]
                         )
                         output_suffix = "-".join(parts)
 
                         ldflags = ""
 
                         if strip != "" or external != "":
-                            ldflags = f'-ldflags="{" ".join([strip, external])}"'
-
-                        if cgo:
-                            output_suffix += "-cgo"
+                            ldflags = f'-ldflags={" ".join([strip, external])}'
 
                         futures.append(
                             executor.submit(
