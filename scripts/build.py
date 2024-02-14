@@ -8,26 +8,40 @@ from typing import Mapping
 PLATFORM: str = os.getenv("PLATFORM")
 GO_VERSION: str = os.getenv("GO_VERSION")
 ARCH: str = os.getenv("ARCH")
-CGO: str = os.getenv("CGO")
 
 cmd_env: Mapping[str, str] = {
     "GOOS": PLATFORM,
     "GOARCH": ARCH,
 }
 
-if CGO == "":
-    cmd_env["CGO_ENABLED"] = "0"
-else:
-    cmd_env["CGO_ENABLED"] = "1"
-
 write_lock = threading.Lock()
 
+options = {
+    "buildmode": [("exe", ""), ("pie", "pie")],
+    "strip": [
+        ("", ""),
+        ("-s -w", "strip"),
+    ],
+    "external": [
+        ("", ""),
+        ("-linkmode external", "ext"),
+    ],
+    "cgo": [True, False],
+}
 
-def build(buildmode: str, ldflags: str, output_suffix: str) -> None:
-    output = f"bin-{PLATFORM}-{GO_VERSION}-{ARCH}-{output_suffix}{CGO}"
+
+def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
+    output = f"bin-{PLATFORM}-{GO_VERSION}-{ARCH}-{output_suffix}"
     command = rf"go build -a -buildmode={buildmode} {output} {ldflags} -o  ."
+
+    env = cmd_env.copy()
+    if not cgo:
+        env["CGO_ENABLED"] = "0"
+    else:
+        env["CGO_ENABLED"] = "1"
+
     result = subprocess.run(
-        command, shell=True, capture_output=True, text=True, env=cmd_env
+        command, shell=True, capture_output=True, text=True, env=env
     )
     if result.returncode != 0:
         with write_lock:
@@ -36,22 +50,33 @@ def build(buildmode: str, ldflags: str, output_suffix: str) -> None:
                 file.write("Failed to build " + output + "\n" + combined_output)
 
 
+# order: strip-ext-pie-cgo
 def main() -> None:
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [
-            executor.submit(build, "exe", "", ""),
-            executor.submit(build, "exe", '-ldflags="-s -w"', "strip"),
-            executor.submit(build, "pie", "", "pie"),
-            executor.submit(build, "pie", '-ldflags="-s -w"', "strip-pie"),
-            executor.submit(build, "exe", '-ldflags="-linkmode external"', "ext"),
-            executor.submit(
-                build, "exe", '-ldflags="-s -w -linkmode external"', "strip-ext"
-            ),
-            executor.submit(build, "pie", '-ldflags="-linkmode external"', "ext-pie"),
-            executor.submit(
-                build, "pie", '-ldflags="-s -w -linkmode external"', "strip-ext-pie"
-            ),
-        ]
+        futures = []
+
+        for buildmode, buildmode_suffix in options["buildmode"]:
+            for strip, strip_suffix in options["strip"]:
+                for external, external_suffix in options["external"]:
+                    for cgo in options["cgo"]:
+                        output_suffix = (
+                            f"{strip_suffix}-{external_suffix}-{buildmode_suffix}"
+                        )
+
+                        ldflags = ""
+
+                        if strip != "" or external != "":
+                            ldflags = f'-ldflags="{" ".join([strip, external])}"'
+
+                        if cgo:
+                            output_suffix += "-cgo"
+
+                        futures.append(
+                            executor.submit(
+                                build, buildmode, ldflags, cgo, output_suffix
+                            )
+                        )
+
         for future in concurrent.futures.as_completed(futures):
             future.result()
 
