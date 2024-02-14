@@ -34,10 +34,6 @@ options = {
         ("", ""),
         ("-s -w", "strip"),
     ],
-    "external": [
-        ("", ""),
-        ("-linkmode external", "ext"),
-    ],
     "cgo": [
         (True, "cgo"),
         (False, ""),
@@ -109,7 +105,7 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
             logging.error(
                 f"Failed to build `{output}`:\n"
                 f"Command: `{result.args}`\n"
-                f"CGO_ENABLED={env['CGO_ENABLED']}\n"
+                f"CGO_ENABLED: `{env['CGO_ENABLED']}`\n"
                 f"```log\n{remove_empty_lines(combined_output)}\n```\n"
             )
     else:
@@ -127,36 +123,24 @@ def main() -> None:
 
         for buildmode, buildmode_suffix in options["buildmode"]:
             for strip, strip_suffix in options["strip"]:
-                for external, external_suffix in options["external"]:
-                    for cgo, cgo_suffix in options["cgo"]:
-                        if cgo and (not bool(external)):
-                            # cgo by default enables external linking,
-                            # so we skip if external is not enabled
-                            continue
+                for cgo, cgo_suffix in options["cgo"]:
+                    parts = filter(
+                        None,
+                        [
+                            strip_suffix,
+                            buildmode_suffix,
+                            cgo_suffix,
+                        ],
+                    )
+                    output_suffix = "-".join(parts)
 
-                        parts = filter(
-                            None,
-                            [
-                                strip_suffix,
-                                external_suffix,
-                                buildmode_suffix,
-                                cgo_suffix,
-                            ],
-                        )
-                        output_suffix = "-".join(parts)
+                    ldflags = ""
+                    if strip != "":
+                        ldflags = f'-ldflags={strip}'
 
-                        ldflags = ""
-
-                        if strip != "" or external != "":
-                            ldflags = (
-                                f'-ldflags={" ".join(filter(None, [strip, external]))}'
-                            )
-
-                        futures.append(
-                            executor.submit(
-                                build, buildmode, ldflags, cgo, output_suffix
-                            )
-                        )
+                    futures.append(
+                        executor.submit(build, buildmode, ldflags, cgo, output_suffix)
+                    )
 
         for future in concurrent.futures.as_completed(futures):
             future.result()
