@@ -127,7 +127,9 @@ def main() -> None:
             for strip, strip_suffix in options["strip"]:
                 for external, external_suffix in options["external"]:
                     for cgo, cgo_suffix in options["cgo"]:
-                        if cgo and bool(external):
+                        if cgo and (not bool(external)):
+                            # cgo by default enables external linking,
+                            # so we skip if external is not enabled
                             continue
 
                         parts = filter(
