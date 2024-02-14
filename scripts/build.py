@@ -33,7 +33,10 @@ options = {
         ("", ""),
         ("-linkmode external", "ext"),
     ],
-    "cgo": [True, False],
+    "cgo": [
+        (True, "cgo"),
+        (False, ""),
+    ]
 }
 
 go_binary = shutil.which("go")
@@ -59,10 +62,6 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
         env["CGO_ENABLED"] = "0"
     else:
         env["CGO_ENABLED"] = "1"
-
-    if (not cgo) and (ldflags.find("external") != -1):
-        # cgo relies on external linking
-        return
 
     vers = int(GO_VERSION.split(".")[1])
 
@@ -109,6 +108,10 @@ def build(buildmode: str, ldflags: str, cgo: bool, output_suffix: str) -> None:
                     f"CGO_ENABLED={env['CGO_ENABLED']}\n"
                     f"```log\n{remove_empty_lines(combined_output)}\n```\n"
                 )
+    else:
+        with write_lock:
+            with open(os.getenv("GITHUB_STEP_SUMMARY"), "a") as file:
+                file.write(f"Built `{output}` successfully\n")
 
 
 # order: strip-ext-pie-cgo
@@ -123,9 +126,8 @@ def main() -> None:
         for buildmode, buildmode_suffix in options["buildmode"]:
             for strip, strip_suffix in options["strip"]:
                 for external, external_suffix in options["external"]:
-                    for cgo in options["cgo"]:
-                        if cgo and external:
-                            # meaningless, since cgo implies external linking
+                    for cgo, cgo_suffix in options["cgo"]:
+                        if cgo and bool(external):
                             continue
 
                         parts = filter(
@@ -134,7 +136,7 @@ def main() -> None:
                                 strip_suffix,
                                 external_suffix,
                                 buildmode_suffix,
-                                "cgo" if cgo else "",
+                                cgo_suffix,
                             ],
                         )
                         output_suffix = "-".join(parts)
