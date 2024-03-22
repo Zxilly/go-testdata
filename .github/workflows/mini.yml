@@ -125,7 +125,7 @@ jobs:
         if: ${{ github.event_name != 'push' }}
         uses: actions/upload-artifact@v4
         with:
-          name: bin-${{ matrix.platform }}-${{ matrix.go-version }}
+          name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.os}}
           path: |
             ./bin-*
 
