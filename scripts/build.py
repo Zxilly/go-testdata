@@ -74,13 +74,17 @@ def build(
     args = [go_binary, "build", "-a", f"-buildmode={buildmode}"]
     if ldflags:
         args.append(ldflags)
-    args.extend(["-o", output, "."])
+    args.extend(["-o", output, "main.go"])
 
     env = cmd_env.copy()
     if not cgo:
         env["CGO_ENABLED"] = "0"
     else:
         env["CGO_ENABLED"] = "1"
+        args.append("cgo.go")
+
+    if vers >= 16:
+        args.append("embed.go")
 
     vers = int(GO_VERSION.split(".")[1])
 
