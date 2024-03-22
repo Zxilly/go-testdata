@@ -83,10 +83,9 @@ def build(
         env["CGO_ENABLED"] = "1"
         args.append("cgo.go")
 
+    vers = int(GO_VERSION.split(".")[1])
     if vers >= 16:
         args.append("embed.go")
-
-    vers = int(GO_VERSION.split(".")[1])
 
     if buildmode == "pie":
         if PLATFORM == "windows":
