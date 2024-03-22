@@ -1,6 +1,3 @@
-//go:build main1
-// +build main1
-
 package main
 
 import "embed"
