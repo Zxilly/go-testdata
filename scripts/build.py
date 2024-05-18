@@ -47,10 +47,16 @@ options = {
     ],
 }
 
-if is_m1():
-    options["arch"] = [
-        "arm64",
-    ]
+if PLATFORM == "darwin":
+    if is_m1():
+        options["arch"] = [
+            "arm64",
+        ]
+    else:
+        options["arch"] = [
+            "amd64",
+            "386",
+        ]
 
 go_binary = shutil.which("go")
 if go_binary is None:
