@@ -65,6 +65,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu libc6-dev-i386
+          ln -s /usr/include/asm-generic /usr/include/asm
       
       - uses: msys2/setup-msys2@v2
         if: ${{ matrix.platform == 'windows' }}
