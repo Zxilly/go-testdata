@@ -64,6 +64,11 @@ def render_env(env: dict) -> str:
     return "\n".join(f"{k}={v}" for k, v in env.items())
 
 cmd_env = os.environ.copy()
+cmd_env.update(
+    {
+        "GOOS": PLATFORM,
+    }
+)
 
 def build(
     buildmode: str, arch: str, ldflags: str, cgo: bool, output_suffix: str
@@ -83,7 +88,6 @@ def build(
         env["CGO_ENABLED"] = "1"
         args.append("cgo.go")
     env["GOARCH"] = arch
-    env["GOOS"] = PLATFORM
 
     vers = int(GO_VERSION.split(".")[1])
     if vers >= 16:
