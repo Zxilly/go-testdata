@@ -63,7 +63,7 @@ def render_env(env: dict) -> str:
     return "\n".join(f"{k}={v}" for k, v in env.items())
 
 def wrap_in_quotes(s: str) -> str:
-    return f"'{s}'"
+    return f'"{s}"'
 
 cmd_env = os.environ.copy()
 
@@ -93,7 +93,7 @@ def build(
 
     # For windows, run with msys2
     if PLATFORM == "windows":
-        args = ["msys2", "-c", *args]
+        args = ["msys2", "-c", wrap_in_quotes(" ".join(args))]
         if arch == "amd64":
             env["MSYSTEM"] = "CLANG64"
         elif arch == "386":
