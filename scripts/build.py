@@ -18,13 +18,6 @@ GO_VERSION: str = os.getenv("GO_VERSION")
 if not all([PLATFORM, GO_VERSION]):
     raise ValueError("Missing required environment variables")
 
-cmd_env = os.environ.copy()
-cmd_env.update(
-    {
-        "GOOS": PLATFORM,
-    }
-)
-
 log_lock = threading.Lock()
 
 def is_m1():
@@ -56,6 +49,9 @@ if is_m1():
         "arm64",
     ]
 
+if PLATFORM == "linux":
+    options["arch"].append("arm64")
+
 go_binary = shutil.which("go")
 if go_binary is None:
     raise FileNotFoundError("go binary not found in PATH")
@@ -63,6 +59,9 @@ if go_binary is None:
 
 def remove_empty_lines(s: str) -> str:
     return "\n".join(filter(None, s.split("\n")))
+
+def render_env(env: dict) -> str:
+    return "\n".join(f"{k}={v}" for k, v in env.items())
 
 
 def build(
@@ -76,12 +75,14 @@ def build(
         args.append(ldflags)
     args.extend(["-o", output, "main.go"])
 
-    env = cmd_env.copy()
+    env = os.environ.copy()
     if not cgo:
         env["CGO_ENABLED"] = "0"
     else:
         env["CGO_ENABLED"] = "1"
         args.append("cgo.go")
+    env["GOARCH"] = arch
+    env["GOOS"] = PLATFORM
 
     vers = int(GO_VERSION.split(".")[1])
     if vers >= 16:
@@ -118,6 +119,9 @@ def build(
         if vers < 18:
             # a dwarf error, see https://github.com/golang/go/issues/53000
             return
+        
+    if PLATFORM == "linux" and arch == "arm64":
+        env["CC"] = "aarch64-linux-gnu-gcc"
 
     result = subprocess.run(
         args=args,
@@ -132,6 +136,8 @@ def build(
             logging.error(
                 f"Failed to build `{output}`:\n"
                 f"Command: `{result.args}`\n"
+                f"Environment:\n"
+                f"```\n{render_env(env)}\n```\n"
                 f"CGO_ENABLED: `{env['CGO_ENABLED']}`\n"
                 f"```log\n{remove_empty_lines(combined_output)}\n```"
             )
