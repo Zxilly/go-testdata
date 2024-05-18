@@ -40,6 +40,7 @@ options = {
     ],
     "arch": [
         "amd64",
+        "arm64",
         "386",
     ],
 }
@@ -48,9 +49,6 @@ if is_m1():
     options["arch"] = [
         "arm64",
     ]
-
-if PLATFORM == "linux":
-    options["arch"].append("arm64")
 
 go_binary = shutil.which("go")
 if go_binary is None:
@@ -64,11 +62,6 @@ def render_env(env: dict) -> str:
     return "\n".join(f"{k}={v}" for k, v in env.items())
 
 cmd_env = os.environ.copy()
-cmd_env.update(
-    {
-        "GOOS": PLATFORM,
-    }
-)
 
 def build(
     buildmode: str, arch: str, ldflags: str, cgo: bool, output_suffix: str
@@ -81,17 +74,28 @@ def build(
         args.append(ldflags)
     args.extend(["-o", output, "main.go"])
 
-    env = cmd_env.copy()
+    env = dict()
     if not cgo:
         env["CGO_ENABLED"] = "0"
     else:
         env["CGO_ENABLED"] = "1"
         args.append("cgo.go")
     env["GOARCH"] = arch
+    env["GOOS"] = PLATFORM
 
     vers = int(GO_VERSION.split(".")[1])
     if vers >= 16:
         args.append("embed.go")
+
+    # For windows, run with msys2
+    if PLATFORM == "windows":
+        args = ["msys2", "-c", " ".join(args)]
+        if arch == "amd64":
+            env["MSYSTEM"] = "CLANG64"
+        elif arch == "386":
+            env["MSYSTEM"] = "CLANG32"
+        elif arch == "arm64":
+            env["MSYSTEM"] = "CLANGARM64"
 
     if buildmode == "pie":
         if PLATFORM == "windows":
@@ -132,11 +136,12 @@ def build(
     if PLATFORM == "linux" and arch == "arm64":
         env["CC"] = "aarch64-linux-gnu-gcc"
 
+    full_env = {**cmd_env, **env}
     result = subprocess.run(
         args=args,
         capture_output=True,
         text=True,
-        env=env,
+        env=full_env,
     )
     if result.returncode != 0:
         print(f"Failed to build `{output}`")

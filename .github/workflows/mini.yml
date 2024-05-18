@@ -50,6 +50,9 @@ jobs:
             os: macos-14
       fail-fast: true
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Install Go
         uses: actions/setup-go@v5
         with:
@@ -57,14 +60,14 @@ jobs:
           cache: false
           check-latest: true
 
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Setup Linux
         if: ${{ matrix.platform == 'linux' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu
+      
+      - uses: msys2/setup-msys2@v2
+        if: ${{ matrix.platform == 'windows' }}
 
       - name: Build binaries
         shell: bash
@@ -109,15 +112,18 @@ jobs:
             os: macos-11
       fail-fast: true
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Install Go
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
           cache: false
           check-latest: true
-
-      - name: Checkout code
-        uses: actions/checkout@v4
+      
+      - uses: msys2/setup-msys2@v2
+        if: ${{ matrix.platform == 'windows' }}
 
       - name: Build binaries
         shell: bash
