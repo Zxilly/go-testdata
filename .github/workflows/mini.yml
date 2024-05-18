@@ -65,7 +65,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu gcc-11-multilib
-      
+
       - uses: msys2/setup-msys2@v2
         if: ${{ matrix.platform == 'windows' }}
         with:
@@ -126,13 +126,20 @@ jobs:
           go-version: ${{ matrix.go-version }}
           cache: false
           check-latest: true
-      
+
+      - name: Setup Linux
+        if: ${{ matrix.platform == 'linux' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu gcc-9-multilib
+
       - uses: msys2/setup-msys2@v2
         if: ${{ matrix.platform == 'windows' }}
         with:
           install: >-
-            clang
-
+            mingw-w64-x86_64-gcc
+            mingw-w64-i686-gcc
+            mingw-w64-clang-aarch64-gcc-compat
       - name: Build binaries
         shell: bash
         run: |
