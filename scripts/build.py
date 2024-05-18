@@ -92,7 +92,7 @@ def build(
 
     # For windows, run with msys2
     if PLATFORM == "windows":
-        args = ["msys2", "-c", wrap_in_quotes(" ".join(args))]
+        args = ["msys2", "-c", *args]
         if arch == "amd64":
             env["MSYSTEM"] = "CLANG64"
         elif arch == "386":
