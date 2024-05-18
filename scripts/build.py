@@ -142,7 +142,7 @@ def build(
 
     full_env = {**cmd_env, **env}
     result = subprocess.run(
-        args=args,
+        " ".join(args),
         capture_output=True,
         text=True,
         env=full_env,
