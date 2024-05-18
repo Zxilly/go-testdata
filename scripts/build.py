@@ -103,6 +103,10 @@ def build(
             if vers < 10:
                 # Darwin does not support PIE
                 return
+            
+        if not cgo:
+            # PIE requires cgo
+            return
 
     if cgo:
         if PLATFORM == "darwin":
