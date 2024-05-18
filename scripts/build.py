@@ -82,12 +82,16 @@ cmd_env = os.environ.copy()
 def build(
     buildmode: str, arch: str, ldflags: str, cgo: bool, output_suffix: str
 ) -> None:
+    vers = int(GO_VERSION.split(".")[1])
+    
     output = f"bin-{PLATFORM}-{GO_VERSION}-{arch}" + (
         f"-{output_suffix}" if output_suffix else ""
     )
     args = [go_binary, "build", "-a", f"-buildmode={buildmode}"]
+    
     if ldflags:
-        args.append(ldflags)
+        args.append(wrap_in_quotes(ldflags))
+    
     args.extend(["-o", output, "main.go"])
 
     env = dict()
@@ -99,7 +103,6 @@ def build(
     env["GOARCH"] = arch
     env["GOOS"] = PLATFORM
 
-    vers = int(GO_VERSION.split(".")[1])
     if vers >= 16:
         args.append("embed.go")
 
