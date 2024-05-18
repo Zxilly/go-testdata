@@ -137,6 +137,10 @@ def build(
                 # Windows does not support arm64
                 return
 
+    if arch == "386" and PLATFORM == "darwin":
+        # 386 is not supported on macOS
+        return
+
     if cgo:
         if PLATFORM == "darwin":
             if vers < 10:
