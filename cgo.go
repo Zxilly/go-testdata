@@ -6,13 +6,14 @@ package main
 /*
 #include <stdio.h>
 
-void printint(int v) {
-	printf("printint: %d\n", v);
+int printint(int v) {
+	return v * 123456;
 }
 */
 import "C"
+import "fmt"
 
 func init() {
 	v := 42
-	C.printint(C.int(v))
+	fmt.Println(C.printint(C.int(v)))
 }
