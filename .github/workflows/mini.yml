@@ -65,6 +65,7 @@ jobs:
         run: |
           sudo apt-fast update
           sudo apt-fast install -y gcc-aarch64-linux-gnu gcc-11-multilib
+          ln -s /usr/include/asm-generic /usr/include/asm
 
       - uses: msys2/setup-msys2@v2
         if: ${{ matrix.platform == 'windows' }}
@@ -132,6 +133,7 @@ jobs:
         run: |
           sudo apt-fast update
           sudo apt-fast install -y gcc-multilib
+          ln -s /usr/include/asm-generic /usr/include/asm
 
       - name: Build binaries
         shell: bash
