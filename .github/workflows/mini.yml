@@ -126,6 +126,12 @@ jobs:
           go-version: ${{ matrix.go-version }}
           cache: false
           check-latest: true
+      
+      - name: Setup Linux
+        if: ${{ matrix.platform == 'linux' }}
+        run: |
+          sudo apt-fast update
+          sudo apt-fast install -y gcc-multilib
 
       - name: Build binaries
         shell: bash
