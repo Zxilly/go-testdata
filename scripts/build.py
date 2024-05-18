@@ -101,12 +101,15 @@ def build(
     if PLATFORM == "windows":
         args = ["msys2", "-c", wrap_in_quotes(" ".join(args))]
         if arch == "amd64":
-            env["MSYSTEM"] = "CLANG64"
+            env["MSYSTEM"] = "MINGW64"
+            env["CC"] = "gcc"
         elif arch == "386":
-            env["MSYSTEM"] = "CLANG32"
+            env["MSYSTEM"] = "MINGW32"
+            env["CC"] = "gcc"
         elif arch == "arm64":
             env["MSYSTEM"] = "CLANGARM64"
-        env["CC"] = "clang"
+            env["CC"] = "clang"
+        
 
     if buildmode == "pie":
         if PLATFORM == "windows":
@@ -127,6 +130,12 @@ def build(
         if not cgo:
             # PIE requires cgo
             return
+    
+    if arch == "arm64":
+        if PLATFORM == "windows":
+            if vers < 16:
+                # Windows does not support arm64
+                return
 
     if cgo:
         if PLATFORM == "darwin":
