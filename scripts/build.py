@@ -53,6 +53,7 @@ if is_m1():
 go_binary = shutil.which("go")
 if go_binary is None:
     raise FileNotFoundError("go binary not found in PATH")
+go_binary = go_binary.replace("\\", "/")
 
 
 def remove_empty_lines(s: str) -> str:
