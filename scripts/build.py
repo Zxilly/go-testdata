@@ -63,6 +63,7 @@ def remove_empty_lines(s: str) -> str:
 def render_env(env: dict) -> str:
     return "\n".join(f"{k}={v}" for k, v in env.items())
 
+cmd_env = os.environ.copy()
 
 def build(
     buildmode: str, arch: str, ldflags: str, cgo: bool, output_suffix: str
@@ -75,7 +76,7 @@ def build(
         args.append(ldflags)
     args.extend(["-o", output, "main.go"])
 
-    env = os.environ.copy()
+    env = cmd_env.copy()
     if not cgo:
         env["CGO_ENABLED"] = "0"
     else:
