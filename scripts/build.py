@@ -110,14 +110,11 @@ def build(
     if PLATFORM == "windows":
         args = ["msys2", "-c", wrap_in_quotes(" ".join(args))]
         if arch == "amd64":
-            env["MSYSTEM"] = "UCRT64"
-            env["CC"] = "gcc"
+            env["CC"] = "mingw-w64-x86_64-gcc"
         elif arch == "386":
-            env["CLANG32"] = "MINGW32"
-            env["CC"] = "clang"
+            env["CC"] = "mingw-w64-i686-gcc"
         elif arch == "arm64":
-            env["MSYSTEM"] = "CLANGARM64"
-            env["CC"] = "clang"
+            env["CC"] = "mingw-w64-clang-aarch64-gcc-compat"
         
 
     if buildmode == "pie":

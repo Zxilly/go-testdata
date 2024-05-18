@@ -71,7 +71,9 @@ jobs:
         if: ${{ matrix.platform == 'windows' }}
         with:
           install: >-
-            clang
+            mingw-w64-x86_64-gcc
+            mingw-w64-i686-gcc
+            mingw-w64-clang-aarch64-gcc-compat
 
       - name: Build binaries
         shell: bash
