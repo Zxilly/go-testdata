@@ -83,15 +83,15 @@ def build(
     buildmode: str, arch: str, ldflags: str, cgo: bool, output_suffix: str
 ) -> None:
     vers = int(GO_VERSION.split(".")[1])
-    
+
     output = f"bin-{PLATFORM}-{GO_VERSION}-{arch}" + (
         f"-{output_suffix}" if output_suffix else ""
     )
     args = [go_binary, "build", "-a", f"-buildmode={buildmode}"]
-    
+
     if ldflags:
         args.append(wrap_in_quotes(ldflags))
-    
+
     args.extend(["-o", output, "main.go"])
 
     env = dict()
@@ -115,7 +115,9 @@ def build(
             env["CC"] = "i686-w64-mingw32-gcc"
         elif arch == "arm64":
             env["CC"] = "aarch64-w64-mingw32-gcc"
-        
+
+    if vers <= 10 and arch == "arm64":
+        return
 
     if buildmode == "pie":
         if PLATFORM == "windows":
@@ -136,7 +138,7 @@ def build(
         if not cgo:
             # PIE requires cgo
             return
-    
+
     if arch == "arm64":
         if PLATFORM == "windows":
             if vers < 16:
