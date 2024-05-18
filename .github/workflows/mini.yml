@@ -124,6 +124,9 @@ jobs:
       
       - uses: msys2/setup-msys2@v2
         if: ${{ matrix.platform == 'windows' }}
+        with:
+          install: >-
+            clang
 
       - name: Build binaries
         shell: bash

@@ -20,13 +20,15 @@ if not all([PLATFORM, GO_VERSION]):
 
 log_lock = threading.Lock()
 
+
 def is_m1():
     system = platform.system()
     architecture = platform.machine()
-    if system == 'Darwin' and architecture == 'arm64':
+    if system == "Darwin" and architecture == "arm64":
         return True
     else:
         return False
+
 
 options = {
     "buildmode": [("exe", ""), ("pie", "pie")],
@@ -59,13 +61,17 @@ go_binary = go_binary.replace("\\", "/")
 def remove_empty_lines(s: str) -> str:
     return "\n".join(filter(None, s.split("\n")))
 
+
 def render_env(env: dict) -> str:
     return "\n".join(f"{k}={v}" for k, v in env.items())
+
 
 def wrap_in_quotes(s: str) -> str:
     return f'"{s}"'
 
+
 cmd_env = os.environ.copy()
+
 
 def build(
     buildmode: str, arch: str, ldflags: str, cgo: bool, output_suffix: str
@@ -100,6 +106,7 @@ def build(
             env["MSYSTEM"] = "CLANG32"
         elif arch == "arm64":
             env["MSYSTEM"] = "CLANGARM64"
+        env["CC"] = "clang"
 
     if buildmode == "pie":
         if PLATFORM == "windows":
@@ -116,7 +123,7 @@ def build(
             if vers < 10:
                 # Darwin does not support PIE
                 return
-            
+
         if not cgo:
             # PIE requires cgo
             return
@@ -131,12 +138,12 @@ def build(
             if vers < 6:
                 # ld error
                 return
-            
+
     if is_m1() and cgo:
         if vers < 18:
             # a dwarf error, see https://github.com/golang/go/issues/53000
             return
-        
+
     if PLATFORM == "linux" and arch == "arm64":
         env["CC"] = "aarch64-linux-gnu-gcc"
 
