@@ -110,11 +110,11 @@ def build(
     if PLATFORM == "windows":
         args = ["msys2", "-c", wrap_in_quotes(" ".join(args))]
         if arch == "amd64":
-            env["MSYSTEM"] = "MINGW64"
+            env["MSYSTEM"] = "UCRT64"
             env["CC"] = "gcc"
         elif arch == "386":
-            env["MSYSTEM"] = "MINGW32"
-            env["CC"] = "gcc"
+            env["CLANG32"] = "MINGW32"
+            env["CC"] = "clang"
         elif arch == "arm64":
             env["MSYSTEM"] = "CLANGARM64"
             env["CC"] = "clang"
@@ -182,11 +182,10 @@ def build(
         with log_lock:
             combined_output = result.stdout + "\n" + result.stderr
             logging.error(
-                f"Failed to build `{output}`:\n"
+                f"## {output} Failed\n"
                 f"Command: `{result.args}`\n"
                 f"Environment:\n"
                 f"```\n{render_env(env)}\n```\n"
-                f"CGO_ENABLED: `{env['CGO_ENABLED']}`\n"
                 f"```log\n{remove_empty_lines(combined_output)}\n```"
             )
     else:
