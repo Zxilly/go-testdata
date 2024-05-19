@@ -93,11 +93,13 @@ def build(
     output = f"bin-{PLATFORM}-{GO_VERSION}-{arch}" + (
         f"-{output_suffix}" if output_suffix else ""
     )
+    output = wrap_in_quotes(os.path.abspath(output))
+
     args = [go_binary, "build", "-a", f"-buildmode={buildmode}"]
 
     if ldflags:
         args.append(wrap_in_quotes(ldflags))
-
+    
     args.extend(["-o", output, "main.go"])
 
     env = dict()
