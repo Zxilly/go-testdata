@@ -256,6 +256,10 @@ def main() -> None:
         for future in concurrent.futures.as_completed(futures):
             future.result()
 
+    for file in os.listdir("."):
+        if os.path.isfile(file):
+            print(file)
+
 
 if __name__ == "__main__":
     main()
