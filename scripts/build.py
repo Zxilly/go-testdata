@@ -79,6 +79,8 @@ def render_env(env: dict) -> str:
 
 
 def wrap_in_quotes(s: str) -> str:
+    if PLATFORM == "windows":
+        s = s.replace('"', '"""')
     return f'"{s}"'
 
 
