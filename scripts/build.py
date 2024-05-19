@@ -78,10 +78,6 @@ def render_env(env: dict) -> str:
     return "\n".join(f"{k}={v}" for k, v in env.items())
 
 
-def wrap_in_quotes(s: str) -> str:
-    return f'"{s}"'
-
-
 cmd_env = os.environ.copy()
 
 
@@ -93,12 +89,12 @@ def build(
     output = f"bin-{PLATFORM}-{GO_VERSION}-{arch}" + (
         f"-{output_suffix}" if output_suffix else ""
     )
-    output = wrap_in_quotes(os.path.abspath(output).replace("\\", "/"))
+    output = os.path.abspath(output).replace("\\", "/")
 
     args = [go_binary, "build", "-a", f"-buildmode={buildmode}"]
 
     if ldflags:
-        args.append(wrap_in_quotes(ldflags))
+        args.append(ldflags)
 
     args.extend(["-o", output, "main.go"])
 
