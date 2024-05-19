@@ -93,13 +93,13 @@ def build(
     output = f"bin-{PLATFORM}-{GO_VERSION}-{arch}" + (
         f"-{output_suffix}" if output_suffix else ""
     )
-    output = wrap_in_quotes(os.path.abspath(output))
+    output = wrap_in_quotes(os.path.abspath(output).replace("\\", "/"))
 
     args = [go_binary, "build", "-a", f"-buildmode={buildmode}"]
 
     if ldflags:
         args.append(wrap_in_quotes(ldflags))
-    
+
     args.extend(["-o", output, "main.go"])
 
     env = dict()
@@ -224,39 +224,23 @@ def main() -> None:
     if int(verbit) < 16:
         replace_string_in_file("go.mod", "go 1.16", f"go {version}")
 
-    worker_count = os.cpu_count()
-    if PLATFORM == "windows":
-        worker_count = 1
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=worker_count) as executor:
-        futures = []
-
-        for buildmode, buildmode_suffix in options["buildmode"]:
-            for strip, strip_suffix in options["strip"]:
-                for cgo, cgo_suffix in options["cgo"]:
-                    for arch in options["arch"]:
-                        parts = filter(
-                            None,
-                            [
-                                strip_suffix,
-                                buildmode_suffix,
-                                cgo_suffix,
-                            ],
-                        )
-                        output_suffix = "-".join(parts)
-
-                        ldflags = ""
-                        if strip != "":
-                            ldflags = f"-ldflags={strip}"
-
-                        futures.append(
-                            executor.submit(
-                                build, buildmode, arch, ldflags, cgo, output_suffix
-                            )
-                        )
-
-        for future in concurrent.futures.as_completed(futures):
-            future.result()
+    for buildmode, buildmode_suffix in options["buildmode"]:
+        for strip, strip_suffix in options["strip"]:
+            for cgo, cgo_suffix in options["cgo"]:
+                for arch in options["arch"]:
+                    parts = filter(
+                        None,
+                        [
+                            strip_suffix,
+                            buildmode_suffix,
+                            cgo_suffix,
+                        ],
+                    )
+                    output_suffix = "-".join(parts)
+                    ldflags = ""
+                    if strip != "":
+                        ldflags = f"-ldflags={strip}"
+                    build(buildmode, arch, ldflags, cgo, output_suffix)
 
     for file in os.listdir("."):
         if os.path.isfile(file):
