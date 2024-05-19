@@ -110,10 +110,13 @@ def build(
     if PLATFORM == "windows":
         args = ["msys2", "-c", wrap_in_quotes(" ".join(args))]
         if arch == "amd64":
+            env["MSYSTEM"] = "MINGW64"
             env["CC"] = "x86_64-w64-mingw32-gcc"
         elif arch == "386":
+            env["MSYSTEM"] = "MINGW32"
             env["CC"] = "i686-w64-mingw32-gcc"
         elif arch == "arm64":
+            env["MSYSTEM"] = "CLANGARM64"
             env["CC"] = "aarch64-w64-mingw32-gcc"
 
     if vers <= 10 and arch == "arm64":
