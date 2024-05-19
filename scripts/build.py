@@ -58,6 +58,12 @@ if PLATFORM == "darwin":
             "386",
         ]
 
+if PLATFORM == "windows":
+    options["arch"] = [
+        "amd64",
+        "386",
+    ]
+
 go_binary = shutil.which("go")
 if go_binary is None:
     raise FileNotFoundError("go binary not found in PATH")
@@ -115,9 +121,6 @@ def build(
         elif arch == "386":
             env["MSYSTEM"] = "MINGW32"
             env["CC"] = "i686-w64-mingw32-gcc"
-        elif arch == "arm64":
-            env["MSYSTEM"] = "CLANGARM64"
-            env["CC"] = "aarch64-w64-mingw32-gcc"
 
     if vers <= 10 and arch == "arm64":
         return

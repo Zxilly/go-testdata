@@ -73,7 +73,6 @@ jobs:
           install: >-
             mingw-w64-x86_64-gcc
             mingw-w64-i686-gcc
-            mingw-w64-clang-aarch64-gcc-compat
 
       - name: Build binaries
         shell: bash
@@ -141,7 +140,6 @@ jobs:
           install: >-
             mingw-w64-x86_64-gcc
             mingw-w64-i686-gcc
-            mingw-w64-clang-aarch64-gcc-compat
 
       - name: Build binaries
         shell: bash
