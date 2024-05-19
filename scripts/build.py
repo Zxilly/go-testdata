@@ -194,7 +194,7 @@ def build(
                 f"```log\n{remove_empty_lines(combined_output)}\n```"
             )
     else:
-        print(f"Built `{output}` successfully")
+        print(f"Built `{output}` successfully \n {" ".join(args)}")
 
 
 def replace_string_in_file(file_path: str, old_string: str, new_string: str) -> None:
