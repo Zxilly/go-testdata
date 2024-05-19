@@ -194,8 +194,31 @@ def build(
         print(f"Built `{output}` successfully")
 
 
+def replace_string_in_file(file_path: str, old_string: str, new_string: str) -> None:
+    try:
+        # Open the file for reading
+        with open(file_path, "r") as file:
+            file_data = file.read()
+
+        # Replace the string
+        modified_data = file_data.replace(old_string, new_string)
+
+        # Open the file for writing
+        with open(file_path, "w") as file:
+            file.write(modified_data)
+
+        print(f"String '{old_string}' successfully replaced with '{new_string}'")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
 # order: strip-ext-pie-cgo
 def main() -> None:
+    version = GO_VERSION
+    verbit = version.split(".")[1]
+    if int(verbit) < 16:
+        replace_string_in_file("go.mod", "go 1.16", f"go {version}")
+
     worker_count = os.cpu_count()
     if PLATFORM == "windows":
         worker_count = 1
