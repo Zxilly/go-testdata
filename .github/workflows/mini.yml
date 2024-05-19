@@ -134,6 +134,14 @@ jobs:
           sudo apt-fast update
           sudo apt-fast install -y gcc-multilib
           sudo ln -s /usr/include/asm-generic /usr/include/asm
+  
+      - uses: msys2/setup-msys2@v2
+        if: ${{ matrix.platform == 'windows' }}
+        with:
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-i686-gcc
+            mingw-w64-clang-aarch64-gcc-compat
 
       - name: Build binaries
         shell: bash
