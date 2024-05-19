@@ -34,7 +34,7 @@ options = {
     "buildmode": [("exe", ""), ("pie", "pie")],
     "strip": [
         ("", ""),
-        ("\"-s -w\"", "strip"),
+        ("-s -w", "strip"),
     ],
     "cgo": [
         (True, "cgo"),
@@ -77,6 +77,13 @@ def remove_empty_lines(s: str) -> str:
 def render_env(env: dict) -> str:
     return "\n".join(f"{k}={v}" for k, v in env.items())
 
+def render_args(args: list) -> str:
+    new_args = []
+    for arg in args:
+        if " " in arg:
+            arg = f'"{arg}"'
+        new_args.append(arg)
+    return " ".join(new_args)
 
 cmd_env = os.environ.copy()
 
@@ -112,7 +119,7 @@ def build(
 
     # For windows, run with msys2
     if PLATFORM == "windows":
-        args = ["msys2.cmd", "-c", " ".join(args)]
+        args = ["msys2.cmd", "-c", render_args(args)]
         if arch == "amd64":
             env["MSYSTEM"] = "MINGW64"
             env["CC"] = "x86_64-w64-mingw32-gcc"
