@@ -79,8 +79,6 @@ def render_env(env: dict) -> str:
 
 
 def wrap_in_quotes(s: str) -> str:
-    if PLATFORM == "windows":
-        s = s.replace('"', '"""')
     return f'"{s}"'
 
 
@@ -118,7 +116,7 @@ def build(
 
     # For windows, run with msys2
     if PLATFORM == "windows":
-        args = ["msys2", "-c", wrap_in_quotes(" ".join(args))]
+        args = ["msys2.cmd", "-c", " ".join(args)]
         if arch == "amd64":
             env["MSYSTEM"] = "MINGW64"
             env["CC"] = "x86_64-w64-mingw32-gcc"
@@ -180,11 +178,10 @@ def build(
 
     full_env = {**cmd_env, **env}
     result = subprocess.run(
-        " ".join(args),
+        args=args,
         capture_output=True,
         text=True,
         env=full_env,
-        shell=True,
     )
     if result.returncode != 0:
         print(f"Failed to build `{output}`")
