@@ -111,6 +111,9 @@ def build(
     else:
         env["CGO_ENABLED"] = "1"
         args.append("cgo.go")
+        if vers >= 19:
+            args.append("sqlite.go")
+
     env["GOARCH"] = arch
     env["GOOS"] = PLATFORM
 
