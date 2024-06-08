@@ -98,7 +98,7 @@ def build(
     )
     output = os.path.abspath(output).replace("\\", "/")
 
-    args = [go_binary, "build", "-a", f"-buildmode={buildmode}"]
+    args = [go_binary, "build", "-a", f"-buildmode={buildmode}", "-gcflags=-l"]
 
     if ldflags:
         args.append(ldflags)
