@@ -18,6 +18,13 @@ var GlobalFloat = 12345.6789
 var GlobalComplex = 12345.6789 + 12345.6789i
 var GlobalRune = 'a'
 
+var GlobalAbstractInt int
+var GlobalAbstractString string
+var GlobalAbstractBool bool
+var GlobalAbstractFloat float64
+var GlobalAbstractComplex complex128
+var GlobalAbstractRune rune
+
 type ComplexStruct struct {
 	Str string
 	Num int
@@ -121,6 +128,42 @@ func UsingStackString() {
 	println(stackString)
 }
 
+//go:noinline
+func UsingGlobalAbstractInt() {
+	reflect.ValueOf(&GlobalAbstractInt).Elem().SetInt(12345)
+	println(GlobalAbstractInt)
+}
+
+//go:noinline
+func UsingGlobalAbstractString() {
+	reflect.ValueOf(&GlobalAbstractString).Elem().SetString("this is a global abstract string")
+	println(GlobalAbstractString)
+}
+
+//go:noinline
+func UsingGlobalAbstractBool() {
+	reflect.ValueOf(&GlobalAbstractBool).Elem().SetBool(true)
+	println(GlobalAbstractBool)
+}
+
+//go:noinline
+func UsingGlobalAbstractFloat() {
+	reflect.ValueOf(&GlobalAbstractFloat).Elem().SetFloat(12345.6789)
+	println(GlobalAbstractFloat)
+}
+
+//go:noinline
+func UsingGlobalAbstractComplex() {
+	reflect.ValueOf(&GlobalAbstractComplex).Elem().SetComplex(12345.6789 + 12345.6789i)
+	println(GlobalAbstractComplex)
+}
+
+//go:noinline
+func UsingGlobalAbstractRune() {
+	reflect.ValueOf(&GlobalAbstractRune).Elem().SetInt('a')
+	println(GlobalAbstractRune)
+}
+
 type TestStruct struct {
 	A int
 	B string
@@ -148,6 +191,13 @@ func main() {
 	UsingGlobalComplex()
 	UsingGlobalRune()
 	UsingStackString()
+
+	UsingGlobalAbstractInt()
+	UsingGlobalAbstractString()
+	UsingGlobalAbstractBool()
+	UsingGlobalAbstractFloat()
+	UsingGlobalAbstractComplex()
+	UsingGlobalAbstractRune()
 
 	UsingComplexStruct()
 	UsingComplexPointerStruct()
