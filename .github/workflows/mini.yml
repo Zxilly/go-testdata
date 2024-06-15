@@ -101,7 +101,7 @@ jobs:
           - "1.8"
           - "1.9"
           - "1.10"
-        os: [windows-2019, ubuntu-20.04, macos-11]
+        os: [windows-2019, ubuntu-20.04, macos-12]
         include:
           - os: windows-2019
             platform: windows
@@ -111,9 +111,9 @@ jobs:
             platform: darwin
         exclude:
           - go-version: "1.5"
-            os: macos-11
+            os: macos-12
           - go-version: "1.6"
-            os: macos-11
+            os: macos-12
       fail-fast: true
     steps:
       - name: Checkout code
