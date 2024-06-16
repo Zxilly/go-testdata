@@ -34,7 +34,7 @@ options = {
     "buildmode": [("exe", ""), ("pie", "pie")],
     "strip": [
         ("", ""),
-        ("-w", "stripdwarf")
+        ("-w", "stripdwarf"),
         ("-s -w", "strip"),
     ],
     "cgo": [
