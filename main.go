@@ -30,6 +30,7 @@ type ComplexStruct struct {
 	Num int
 }
 
+
 type ComplexPointerStruct struct {
 	Str *string
 	Num *int
