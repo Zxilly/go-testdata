@@ -5,6 +5,7 @@ import concurrent.futures
 import threading
 import logging
 import platform
+import time
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -188,6 +189,9 @@ def build(
     if PLATFORM == "linux" and arch == "arm64":
         env["CC"] = "aarch64-linux-gnu-gcc"
 
+    print(f"Building `{output}`", flush=True)
+    start = time.time()
+
     full_env = {**cmd_env, **env}
     result = subprocess.run(
         args=args,
@@ -207,7 +211,8 @@ def build(
                 f"```log\n{remove_empty_lines(combined_output)}\n```"
             )
     else:
-        print(f"Built `{output}` successfully\n {' '.join(args)}", flush=True)
+        cost = time.time() - start
+        print(f"Built `{output}` successfully in {cost}s\n {' '.join(args)}", flush=True)
 
 
 def replace_string_in_file(file_path: str, old_string: str, new_string: str) -> None:
