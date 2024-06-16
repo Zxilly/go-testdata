@@ -196,7 +196,7 @@ def build(
         env=full_env,
     )
     if result.returncode != 0:
-        print(f"Failed to build `{output}`")
+        print(f"Failed to build `{output}`", flush=True)
         with log_lock:
             combined_output = result.stdout + "\n" + result.stderr
             logging.error(
@@ -207,7 +207,7 @@ def build(
                 f"```log\n{remove_empty_lines(combined_output)}\n```"
             )
     else:
-        print(f"Built `{output}` successfully\n {' '.join(args)}")
+        print(f"Built `{output}` successfully\n {' '.join(args)}", flush=True)
 
 
 def replace_string_in_file(file_path: str, old_string: str, new_string: str) -> None:
@@ -223,9 +223,9 @@ def replace_string_in_file(file_path: str, old_string: str, new_string: str) -> 
         with open(file_path, "w") as file:
             file.write(modified_data)
 
-        print(f"String '{old_string}' successfully replaced with '{new_string}'")
+        print(f"String '{old_string}' successfully replaced with '{new_string}'", flush=True)
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An error occurred: {e}", flush=True)
 
 
 # order: strip-ext-pie-cgo
@@ -253,9 +253,9 @@ def main() -> None:
                         ldflags = f"-ldflags={strip}"
                     build(buildmode, arch, ldflags, cgo, output_suffix)
 
-    for file in os.listdir("."):
-        if os.path.isfile(file):
-            print(file)
+    # for file in os.listdir("."):
+    #     if os.path.isfile(file):
+    #         print(file)
 
 
 if __name__ == "__main__":
