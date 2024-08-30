@@ -14,11 +14,6 @@ jobs:
     strategy:
       matrix:
         go-version:
-          # - "1.11"
-          # - "1.12"
-          # - "1.13"
-          # - "1.14"
-          # - "1.15"
           - "1.16"
           - "1.17"
           - "1.18"
@@ -26,6 +21,7 @@ jobs:
           - "1.20"
           - "1.21"
           - "1.22"
+          - "1.23"
         os: [windows-2022, macos-12, ubuntu-22.04, macos-14]
         include:
           - os: windows-2022
@@ -36,18 +32,6 @@ jobs:
             platform: darwin
           - os: ubuntu-22.04
             platform: linux
-        exclude:
-          # darwin/arm64 available from go 1.16
-          - go-version: "1.11"
-            os: macos-14
-          - go-version: "1.12"
-            os: macos-14
-          - go-version: "1.13"
-            os: macos-14
-          - go-version: "1.14"
-            os: macos-14
-          - go-version: "1.15"
-            os: macos-14
       fail-fast: true
     steps:
       - name: Checkout code
@@ -88,65 +72,6 @@ jobs:
           name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.os }}
           path: |
             ./bin-*
-
-  # build_old:
-  #   name: Build old versions
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     matrix:
-  #       go-version:
-  #         # - "1.5"
-  #         # - "1.6"
-  #         # - "1.7"
-  #         # - "1.8"
-  #         # - "1.9"
-  #         - "1.10"
-  #       os: [windows-2019, ubuntu-20.04]
-  #       include:
-  #         - os: windows-2019
-  #           platform: windows
-  #         - os: ubuntu-20.04
-  #           platform: linux
-  #     fail-fast: true
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Install Go
-  #       uses: actions/setup-go@v5
-  #       with:
-  #         go-version: ${{ matrix.go-version }}
-  #         cache: false
-  #         check-latest: true
-      
-  #     - name: Setup Linux
-  #       if: ${{ matrix.platform == 'linux' }}
-  #       run: |
-  #         sudo apt-fast update
-  #         sudo apt-fast install -y gcc-multilib
-  #         sudo ln -s /usr/include/asm-generic /usr/include/asm
-  
-  #     - uses: msys2/setup-msys2@v2
-  #       if: ${{ matrix.platform == 'windows' }}
-  #       with:
-  #         install: >-
-  #           mingw-w64-x86_64-gcc
-  #           mingw-w64-i686-gcc
-
-  #     - name: Build binaries
-  #       shell: bash
-  #       run: |
-  #         python scripts/build.py
-  #       env:
-  #         PLATFORM: ${{ matrix.platform }}
-  #         GO_VERSION: ${{ matrix.go-version }}
-
-  #     - name: Upload artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.os }}
-  #         path: |
-  #           ./bin-*
 
   release:
     needs:
