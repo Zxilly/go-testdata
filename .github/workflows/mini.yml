@@ -14,14 +14,9 @@ jobs:
     strategy:
       matrix:
         go-version:
-          - "1.17"
-          - "1.18"
-          - "1.19"
-          - "1.20"
-          - "1.21"
-          - "1.22"
           - "1.23"
           - "1.24"
+          - "1.25"
         os: [windows-2022, macos-13, ubuntu-22.04, macos-14]
         include:
           - os: windows-2022
@@ -35,10 +30,10 @@ jobs:
       fail-fast: true
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Install Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
           go-version: ${{ matrix.go-version }}
           cache: true
@@ -51,7 +46,7 @@ jobs:
           sudo apt-fast install -y gcc-aarch64-linux-gnu gcc-11-multilib
           sudo ln -s /usr/include/asm-generic /usr/include/asm
 
-      - uses: msys2/setup-msys2@v2
+      - uses: msys2/setup-msys2@fb197b72ce45fb24f17bf3f807a388985654d1f2 # v2.29.0
         if: ${{ matrix.platform == 'windows' }}
         with:
           install: >-
@@ -67,7 +62,7 @@ jobs:
           GO_VERSION: ${{ matrix.go-version }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.os }}
           path: |
@@ -79,13 +74,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           path: artifacts
           merge-multiple: true
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2.3.3
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
