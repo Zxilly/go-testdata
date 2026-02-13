@@ -18,12 +18,12 @@ jobs:
           strip: [true, false]
       steps:
         - name: Install Go
-          uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+          uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
           with:
             go-version: ${{ matrix.go-version }}
   
         - name: Checkout code
-          uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+          uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
           with:
             repository: kubernetes/kubernetes
             fetch-depth: 1
@@ -40,7 +40,7 @@ jobs:
             GOARCH: amd64
   
         - name: Upload artifacts
-          uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+          uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
           with:
             name: kubelet-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.strip && '-strip' || '' }}
             path: ./kubelet-${{ matrix.platform }}-${{ matrix.go-version }}-${{ matrix.arch }}${{ matrix.strip && '-strip' || '' }}
@@ -50,13 +50,13 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - name: Download artifacts
-          uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+          uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
           with:
             path: artifacts
             merge-multiple: true
   
         - name: Create Release
-          uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2.3.3
+          uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
