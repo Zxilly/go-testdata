@@ -1,7 +1,6 @@
 import os
 import shutil
 import subprocess
-import concurrent.futures
 import threading
 import logging
 import platform
@@ -248,12 +247,39 @@ def replace_string_in_file(file_path: str, old_string: str, new_string: str) -> 
         print(f"An error occurred: {e}", flush=True)
 
 
+def replace_go_mod_go_version(file_path: str, new_version: str) -> None:
+    """
+    Keep `go.mod`'s `go` directive aligned with the current GO_VERSION.
+
+    This avoids failures when older Go versions in the CI matrix
+    encounter a higher `go` directive.
+    """
+    try:
+        with open(file_path, "r") as file:
+            lines = file.readlines()
+
+        replaced = False
+        for i, line in enumerate(lines):
+            if line.startswith("go "):
+                lines[i] = f"go {new_version}\n"
+                replaced = True
+                break
+
+        if not replaced:
+            raise ValueError("go.mod missing `go ` directive line")
+
+        with open(file_path, "w") as file:
+            file.writelines(lines)
+    except Exception as e:
+        print(f"An error occurred: {e}", flush=True)
+
+
 # order: strip-ext-pie-cgo
 def main() -> None:
     version = GO_VERSION
-    verbit = version.split(".")[1]
-    if int(verbit) < 16:
-        replace_string_in_file("go.mod", "go 1.16", f"go {version}")
+    # Ensure the `go` directive matches the toolchain in this build.
+    # (e.g. avoid Go 1.24 refusing go.mod with `go 1.26`)
+    replace_go_mod_go_version("go.mod", version)
 
     for buildmode, buildmode_suffix in options["buildmode"]:
         for strip, strip_suffix in options["strip"]:
