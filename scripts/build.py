@@ -49,6 +49,11 @@ options = {
     ],
 }
 
+if PLATFORM == "js":
+    options["arch"] = ["wasm"]
+    options["buildmode"] = [("exe", "")]
+    options["cgo"] = [(False, "")]
+
 if PLATFORM == "darwin":
     if is_m1():
         options["arch"] = [
@@ -94,6 +99,10 @@ def build(
     buildmode: str, arch: str, ldflags: str, cgo: bool, output_suffix: str
 ) -> None:
     vers = int(GO_VERSION.split(".")[1])
+
+    if PLATFORM == "js":
+        if arch != "wasm" or cgo or buildmode != "exe":
+            return
 
     output = f"bin-{PLATFORM}-{GO_VERSION}-{arch}" + (
         f"-{output_suffix}" if output_suffix else ""
@@ -141,6 +150,9 @@ def build(
         return
 
     if buildmode == "pie":
+        if PLATFORM == "js":
+            return
+
         if PLATFORM == "windows":
             if vers < 15:
                 # Windows does not support PIE
@@ -171,6 +183,9 @@ def build(
         return
 
     if cgo:
+        if PLATFORM == "js":
+            return
+
         if PLATFORM == "darwin":
             if vers < 10:
                 # have bug on new macOS
