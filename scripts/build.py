@@ -48,7 +48,9 @@ options = {
     ],
 }
 
-if PLATFORM == "js":
+WASM_PLATFORMS = {"js", "wasip1"}
+
+if PLATFORM in WASM_PLATFORMS:
     options["arch"] = ["wasm"]
     options["buildmode"] = [("exe", "")]
     options["cgo"] = [(False, "")]
@@ -99,7 +101,7 @@ def build(
 ) -> None:
     vers = int(GO_VERSION.split(".")[1])
 
-    if PLATFORM == "js":
+    if PLATFORM in WASM_PLATFORMS:
         if arch != "wasm" or cgo or buildmode != "exe":
             return
 
@@ -149,7 +151,7 @@ def build(
         return
 
     if buildmode == "pie":
-        if PLATFORM == "js":
+        if PLATFORM in WASM_PLATFORMS:
             return
 
         if PLATFORM == "windows":
@@ -182,7 +184,7 @@ def build(
         return
 
     if cgo:
-        if PLATFORM == "js":
+        if PLATFORM in WASM_PLATFORMS:
             return
 
         if PLATFORM == "darwin":

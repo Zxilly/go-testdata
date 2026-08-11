@@ -69,7 +69,7 @@ jobs:
             ./bin-*
 
   build-wasm:
-    name: Build wasm
+    name: Build wasm (${{ matrix.platform }}, Go ${{ matrix.go-version }})
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -77,6 +77,9 @@ jobs:
           - "1.24"
           - "1.25"
           - "1.26"
+        platform:
+          - js
+          - wasip1
       fail-fast: true
     steps:
       - name: Checkout code
@@ -94,13 +97,13 @@ jobs:
         run: |
           python3 scripts/build.py
         env:
-          PLATFORM: js
+          PLATFORM: ${{ matrix.platform }}
           GO_VERSION: ${{ matrix.go-version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: bin-js-${{ matrix.go-version }}-ubuntu-22.04
+          name: bin-${{ matrix.platform }}-${{ matrix.go-version }}-ubuntu-22.04
           path: |
             ./bin-*
 
