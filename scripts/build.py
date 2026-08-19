@@ -280,7 +280,7 @@ def replace_go_mod_go_version(file_path: str, new_version: str) -> None:
 def main() -> None:
     version = GO_VERSION
     # Ensure the `go` directive matches the toolchain in this build.
-    # (e.g. avoid Go 1.24 refusing go.mod with `go 1.26`)
+    # (e.g. avoid Go 1.25 refusing go.mod with `go 1.27`)
     replace_go_mod_go_version("go.mod", version)
 
     for buildmode, buildmode_suffix in options["buildmode"]:
