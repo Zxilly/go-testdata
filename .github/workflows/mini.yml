@@ -14,9 +14,9 @@ jobs:
     strategy:
       matrix:
         go-version:
-          - "1.24"
           - "1.25"
           - "1.26"
+          - "1.27"
         os: [windows-2022, macos-15-intel, ubuntu-22.04, macos-14]
         include:
           - os: windows-2022
@@ -74,9 +74,9 @@ jobs:
     strategy:
       matrix:
         go-version:
-          - "1.24"
           - "1.25"
           - "1.26"
+          - "1.27"
         platform:
           - js
           - wasip1
